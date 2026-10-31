@@ -1,7 +1,7 @@
 # 01 — Nuxt en Vercel mediante GitHub Actions
 
 Fecha de creación: 2026-10-31
-Estado: Desplegado por CLI; verificación de Actions en curso
+Estado: Implementado y verificado
 Relacionada con: [conexión y CORS](../backend/04-conectar-frontend-y-cors.md), [procedimiento backend](../backend/01-procedimiento-fastapi-vercel.md)
 
 ## Proyecto
@@ -45,6 +45,8 @@ Workflow: [deploy-frontend-vercel.yml](../../../.github/workflows/deploy-fronten
 | Secreto del frontend | `VERCEL_FRONTEND_TOKEN` |
 
 El usuario creó y guardó el token separado del backend. El workflow ejecuta tipos y lint, obtiene las variables Production con `vercel pull`, compila con `vercel build --prod`, publica con `--prebuilt --prod --json` y verifica `/auth`. Los pushes de `frontend/` a `main` y la ejecución manual activan el flujo. `git.deploymentEnabled=false` evita publicar dos veces el mismo cambio mediante la integración Git nativa.
+
+[Workflow completo verificado sobre `856d8a3`](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177933101). [CI de ambos componentes](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177933136) también terminó correctamente. Se consultó el equipo Vercel y se comprobó que su plan sigue siendo `hobby`; no se contrató una suscripción.
 
 ## Validación y errores observados
 

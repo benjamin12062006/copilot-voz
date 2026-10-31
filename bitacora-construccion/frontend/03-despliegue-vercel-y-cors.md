@@ -1,7 +1,7 @@
 # 03 — Frontend Nuxt en Vercel y conexión a FastAPI
 
 Fecha de creación: 2026-10-31
-Estado: Desplegado y conexión verificada; validación de Actions en curso
+Estado: Implementado y verificado
 Ámbito: frontend y configuración entre servicios
 Relacionada con: [antecedente](02-conexion-api-perfil-mcp-y-voz-en-vivo.md), [backend Vercel](../backend/10-fastapi-vercel-y-actions.md), [procedimiento](../../fonts/deploy/frontend/01-procedimiento-nuxt-vercel.md), [URLs y CORS](../../fonts/deploy/backend/04-conectar-frontend-y-cors.md)
 Revisión de partida: `aa5694c`
@@ -16,4 +16,6 @@ El alias resultante `https://copilot-frontend-lovat.vercel.app` se añadió a CO
 
 El prompt MCP que se copia desde Perfil usa ahora `window.location.origin` para describir la interfaz abierta, junto a la URL API de configuración. Así, las instrucciones copiadas desde producción dejan de dirigir al agente al frontend local.
 
-Comprobaciones: tipos, lint y build Nuxt correctos; frontend HTTP 200; preflight permitido 200 y ajeno 400; navegador con sesión real llegó a Inicio y cargó la biblioteca existente. No se crearon documentos ni se ejecutaron migraciones durante esta validación. Pendiente de cerrar la comprobación del workflow del frontend sobre la versión publicada.
+Comprobaciones: tipos, lint y build Nuxt correctos; frontend HTTP 200; preflight permitido 200 y ajeno 400; navegador con sesión real llegó a Inicio y cargó la biblioteca existente. No se crearon documentos ni se ejecutaron migraciones durante esta validación.
+
+Sobre `856d8a3` terminaron correctamente el [despliegue del frontend](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177933101), el [despliegue del backend](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177933277) y la [validación CI de ambos](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177933136). Se confirmó que el plan Vercel existente es Hobby.

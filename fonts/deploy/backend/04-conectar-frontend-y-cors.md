@@ -63,4 +63,6 @@ Se conserva `copilot/dev`, la base Turso y el bucket existentes. No se ejecutaro
 
 Resultados observados el 2026-10-31: HTML del frontend 200 con la URL API correcta; sin clave secreta en el HTML; preflight del origen permitido 200 con `Access-Control-Allow-Origin` exacto; origen ajeno 400 sin esa cabecera. Tras [publicar las nuevas variables con Actions](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177622994), el navegador completó `/session`, llegó a `/home` y cargó la biblioteca existente. Esto comprobó una sesión real y lecturas a través de ambos servicios; no se crearon documentos para la prueba.
 
+Validación final del código `856d8a3`: [frontend](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177933101), [backend](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177933277) y [CI](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177933136), todas correctas. Los siguientes cambios en las carpetas de aplicación se publican automáticamente mediante sus respectivos workflows.
+
 Si el frontend aparece en `/session` con un error inmediatamente después de cambiar CORS, esperar a que termine el despliegue del backend y reintentar. No ampliar permisos para ocultar una configuración que todavía no se ha publicado.
