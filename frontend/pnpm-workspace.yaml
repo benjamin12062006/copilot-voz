@@ -2,4 +2,3 @@ allowBuilds:
   esbuild: true
   unrs-resolver: true
   vue-demi: false
-  workerd: true

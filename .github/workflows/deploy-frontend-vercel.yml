@@ -1,0 +1,58 @@
+name: Desplegar frontend en Vercel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - frontend/**
+      - .github/workflows/deploy-frontend-vercel.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vercel-frontend-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_FRONTEND_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_FRONTEND_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.5.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: frontend/.node-version
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Verificar configuración del despliegue
+        run: |
+          test -n "$VERCEL_ORG_ID" || { echo 'Falta VERCEL_ORG_ID'; exit 1; }
+          test -n "$VERCEL_PROJECT_ID" || { echo 'Falta VERCEL_FRONTEND_PROJECT_ID'; exit 1; }
+          test -n "$VERCEL_TOKEN" || { echo 'Falta VERCEL_FRONTEND_TOKEN'; exit 1; }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+        env:
+          # Solo para generar tipos; el build usa las claves reales de Vercel.
+          NUXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZXhhbXBsZS50ZXN0JA
+      - run: pnpm lint
+      - run: npm install --global vercel@65.9.0
+      - run: vercel pull --yes --environment=production
+      - run: vercel build --prod
+      - run: vercel deploy --prebuilt --prod --json > deployment.json
+      - name: Comprobar frontend de producción
+        run: |
+          deployment_url=$(node -e "const fs=require('fs');const r=JSON.parse(fs.readFileSync('deployment.json','utf8'));const d=r.deployment||r;const u=d.productionUrl||d.url;if(!u)process.exit(1);console.log(u.startsWith('https://')?u:'https://'+u)")
+          curl --fail --retry 5 --retry-all-errors "$deployment_url/auth" > /dev/null
+          echo "Frontend: $deployment_url" >> "$GITHUB_STEP_SUMMARY"

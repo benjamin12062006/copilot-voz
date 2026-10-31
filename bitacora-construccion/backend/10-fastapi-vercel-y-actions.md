@@ -1,7 +1,7 @@
 # 10 — FastAPI en Vercel y despliegue desde GitHub Actions
 
 Fecha de creación: 2026-10-31
-Estado: Backend desplegado; automatización pendiente de credencial del usuario
+Estado: Implementado y verificado
 Ámbito: despliegue del backend
 Relacionada con: [antecedente](09-preparacion-cloudflare.md), [guía](../../docs/deployment/02-vercel-backend.md), [fuentes](../../docs/fonts/22-vercel-fastapi-y-github-actions.md)
 Revisión de partida: `4525811`
@@ -32,4 +32,6 @@ URL: https://copilot-backend-navy.vercel.app. `GET /health` devuelve 200 y `{"st
 
 Vercel impide crear tokens personales desde la aplicación OAuth del CLI (`Cannot create tokens for this app`). Se solicitó al usuario crear un token en el panel, limitado al proyecto, y guardarlo como secreto `VERCEL_BACKEND_TOKEN` del repositorio. Los IDs ya están guardados como variables GitHub. No se reutilizó la sesión personal general como credencial de CI.
 
-Pendiente: guardar ese token y ejecutar el workflow de producción completo. No se publican valores secretos en este documento.
+El usuario guardó el secreto y se ejecutó Actions. La primera publicación prebuilt detectó una colisión entre `.vercelignore` y `01-preparacion.md`; el commit `aa5694c` excluyó también ese documento del tracing de la función. La [ejecución siguiente](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177318309) terminó correctamente de principio a fin.
+
+La investigación y el proceso completo se conservaron, por petición del usuario, en [fonts/deploy/backend](../../fonts/deploy/backend/01-procedimiento-fastapi-vercel.md). No se publican valores secretos en esos archivos.

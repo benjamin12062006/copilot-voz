@@ -79,7 +79,11 @@ async function copyToken() {
 
 async function copyMcpSkillContext() {
   try {
-    const prompt = buildMcpAndSkillPrompt(config.apiBaseUrl, issuedToken.value);
+    const prompt = buildMcpAndSkillPrompt(
+      config.apiBaseUrl,
+      issuedToken.value,
+      window.location.origin,
+    );
     await navigator.clipboard.writeText(prompt);
     copiedSkill.value = true;
     toast.add({

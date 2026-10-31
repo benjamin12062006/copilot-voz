@@ -30,10 +30,16 @@ Configuración preparada para dos servicios del mismo repositorio:
 
 | Servicio | Directorio | Plataforma |
 | --- | --- | --- |
-| `copilot-frontend` | `frontend` | Workers + recursos estáticos |
+| `copilot-frontend` | `frontend` | Vercel, Nuxt/Nitro y recursos estáticos |
 | `copilot-backend` | `backend` | Vercel Functions, FastAPI y Python 3.12 |
 
-El backend se despliega mediante [GitHub Actions en Vercel](docs/deployment/02-vercel-backend.md), sin Docker ni Containers. Turso y Upstash Blob conservan los datos existentes. El frontend sigue preparado para Cloudflare; su despliegue es una etapa posterior.
+Ambos componentes se despliegan mediante GitHub Actions en Vercel, sin Docker ni Containers. Turso y Upstash Blob conservan los datos existentes.
+
+- Frontend: https://copilot-frontend-lovat.vercel.app
+- Backend: https://copilot-backend-navy.vercel.app
+- [Procedimiento del backend y fuentes consultadas](fonts/deploy/backend/01-procedimiento-fastapi-vercel.md).
+- [Procedimiento del frontend](fonts/deploy/frontend/01-procedimiento-nuxt-vercel.md).
+- [URLs, variables y CORS entre ambos](fonts/deploy/backend/04-conectar-frontend-y-cors.md).
 
 GitHub Actions valida ambos componentes. El workflow de producción del backend ejecuta sus pruebas, obtiene la configuración de Vercel, compila una vez, despliega esos artefactos y comprueba `/health`.
 

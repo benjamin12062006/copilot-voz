@@ -6,7 +6,8 @@
  */
 export function buildMcpAndSkillPrompt(
   apiBaseUrl: string,
-  issuedToken?: string,
+  issuedToken: string | undefined,
+  appOrigin: string,
 ): string {
   const tokenValue =
     issuedToken?.trim() || '<PEGA_AQUI_TU_TOKEN_PERSONAL_DE_PERFIL>';
@@ -23,7 +24,7 @@ export function buildMcpAndSkillPrompt(
     '---',
     '',
     '## 1. Contexto de nuestra aplicación Copilot',
-    '- **Qué es Copilot:** Es nuestra aplicación web (`http://localhost:3000`, estética Focus) para leer y escuchar documentos en español con voz en vivo desde el navegador (`prepareReading` + `easy-speech`), resaltado frase por frase y bloque por bloque, pausa, continuación y salto entre bloques.',
+    `- **Qué es Copilot:** Es nuestra aplicación web (\`${appOrigin}\`, estética Focus) para leer y escuchar documentos en español con voz en vivo desde el navegador (\`prepareReading\` + \`easy-speech\`), resaltado frase por frase y bloque por bloque, pausa, continuación y salto entre bloques.`,
     '- **Qué hace el backend (`FastAPI` + `Turso` + `Upstash Blob`):** Autentica la identidad del usuario y sus tokens personales MCP en Turso, guarda los documentos privados por propietario en Upstash Blob bajo la sección **«Enviado por agentes»** (`origin: "agent"`) y aplica automáticamente el límite de retención configurado por el usuario en la web (20 documentos por defecto, ajustable entre 1 y 100 en **Perfil → Almacenamiento**).',
     '- **Qué hace el servidor MCP (`copilot-voz`):** Es un adaptador `stdio` ligero (`backend/app/mcp_server.py`) que expone **una única herramienta**:',
     '  - `voice_submit_document(title: str, markdown: str, idempotency_key: str)`',
@@ -85,7 +86,7 @@ export function buildMcpAndSkillPrompt(
     '# Voz Redacción (Copilot MCP)',
     '',
     '## Contexto de la aplicación y arquitectura',
-    '- **Interfaz web (Copilot):** El usuario escucha las redacciones en la aplicación web de Copilot (`http://localhost:3000`), que segmenta el texto por bloques y frases en español y lo lee en voz alta resaltando cada bloque y palabra.',
+    `- **Interfaz web (Copilot):** El usuario escucha las redacciones en la aplicación web de Copilot (\`${appOrigin}\`), que segmenta el texto por bloques y frases en español y lo lee en voz alta resaltando cada bloque y palabra.`,
     '- **Transporte y almacenamiento (MCP + FastAPI):** En lugar de crear archivos `.txt` locales en disco ni borrar archivos antiguos manualmente, esta skill utiliza exclusivamente la herramienta MCP `voice_submit_document` del servidor `copilot-voz`.',
     '- **Retención automática:** El backend FastAPI y Turso/Upstash Blob gestionan automáticamente el almacenamiento privado por usuario y el límite de retención configurado en la web. Nunca intentes borrar documentos ni gestionar límites desde el agente.',
     '',

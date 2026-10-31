@@ -1,7 +1,7 @@
 # 02 — FastAPI en Vercel con GitHub Actions
 
 Fecha de creación: 2026-10-31
-Estado: backend desplegado y verificado; credencial de GitHub Actions pendiente
+Estado: backend desplegado y verificado mediante GitHub Actions
 Relacionada con: [fuentes oficiales](../fonts/22-vercel-fastapi-y-github-actions.md), [bitácora](../../bitacora-construccion/backend/10-fastapi-vercel-y-actions.md), [opción anterior](01-cloudflare.md)
 Revisión de partida: `4525811`
 
@@ -15,7 +15,7 @@ Revisión de partida: `4525811`
 - URL de producción: https://copilot-backend-navy.vercel.app
 - Salud verificada: `GET /health` → `200 {"status":"ok"}`.
 
-El frontend se atiende después. Se eliminó la infraestructura de Containers del backend: Dockerfile, Worker TypeScript, Durable Object y dependencias Node de ese adaptador. Turso y Blob no se trasladan ni se migran.
+El frontend se despliega separadamente en https://copilot-frontend-lovat.vercel.app. La [referencia de conexión](../../fonts/deploy/backend/04-conectar-frontend-y-cors.md) conserva las URLs y los orígenes exactos. Se eliminó la infraestructura de Containers del backend: Dockerfile, Worker TypeScript, Durable Object y dependencias Node de ese adaptador. Turso y Blob no se trasladan ni se migran.
 
 Vercel Hobby permite uso personal no comercial, sujeto a sus cuotas. El proyecto no necesita contratar Cloudflare Workers Paid.
 
@@ -38,7 +38,7 @@ Las siguientes variables se configuran en el entorno Production de Vercel, mante
 | `COPILOT_STORAGE_MAX_DOCUMENT_BYTES` | `1048576` |
 | `UPSTASH_DISABLE_TELEMETRY` | `true` |
 
-Los orígenes actuales permiten el frontend local. Al desplegar el frontend, añadir su origen HTTPS a las dos listas y volver a desplegar el backend. No usar `*` ni cambiar la instancia Clerk al conectar el backend: debe verificar los tokens de la instancia existente.
+Los orígenes configurados incluyen `https://copilot-frontend-lovat.vercel.app`, `http://localhost:3000` y `http://127.0.0.1:3000`, en ambas listas. Las modificaciones se aplican al volver a desplegar. No usar `*` ni cambiar la instancia Clerk al conectar el backend: debe verificar los tokens de la instancia existente.
 
 `backend/.env` permanece local. `.vercelignore` y `excludeFiles` excluyen credenciales y configuración de clientes MCP del código enviado y del bundle. `.vercel/` se ignora en Git, incluidos los archivos descargados por `vercel pull`.
 
@@ -58,7 +58,9 @@ Configurar en el repositorio GitHub:
 
 No reutilizar el token personal general del CLI como secreto del repositorio. La credencial de automatización debe estar limitada al proyecto. Rotarla antes de su vencimiento.
 
-La sesión OAuth del CLI permite desplegar pero devuelve `Cannot create tokens for this app` al intentar generar una credencial personal. Crear el token en [Vercel](https://vercel.com/account/settings/tokens) y guardarlo directamente en GitHub como `VERCEL_BACKEND_TOKEN`, sin pegarlo en el chat. Los identificadores del equipo y proyecto ya están guardados como variables del repositorio.
+La sesión OAuth del CLI permite desplegar pero devuelve `Cannot create tokens for this app` al intentar generar una credencial personal. El usuario creó el token en [Vercel](https://vercel.com/account/settings/tokens) y lo guardó directamente en GitHub como `VERCEL_BACKEND_TOKEN`, sin pegarlo en el chat. Los identificadores del equipo y proyecto están guardados como variables del repositorio.
+
+[Ejecución completa verificada](https://github.com/benjamin12062006/copilot-voz/actions/runs/41177318309). La [memoria del procedimiento](../../fonts/deploy/backend/01-procedimiento-fastapi-vercel.md) incluye la investigación, la corrección de exclusiones del bundle y los fallos de autenticación resueltos.
 
 El workflow valida las 29 pruebas del backend antes de ejecutar la secuencia oficial:
 

@@ -25,6 +25,7 @@ jobs:
       NUXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZXhhbXBsZS50ZXN0JA
       NUXT_PUBLIC_CLERK_KEYLESS_DISABLED: 'true'
       NUXT_PUBLIC_PREVIEW_SESSION: 'false'
+      NUXT_PUBLIC_API_BASE_URL: https://copilot-backend-navy.vercel.app/api/v1
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: pnpm/action-setup@v6.1.0
@@ -38,8 +39,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
-      - run: pnpm build:cloudflare
-      - run: pnpm check:cloudflare
+      - run: pnpm build:vercel
 
   backend:
     runs-on: ubuntu-24.04
