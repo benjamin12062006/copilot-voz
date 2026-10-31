@@ -6,6 +6,9 @@ const { state: access, actions } = useAccess();
 const library = useDocumentLibrary();
 const colorMode = useColorMode();
 
+// Aquí y no en cada página: así sigue leyendo al cambiar de vista.
+useAutoReader();
+
 const user = computed(() =>
   access.value.status === 'ready' ? access.value.user : null,
 );

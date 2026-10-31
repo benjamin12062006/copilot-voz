@@ -87,7 +87,8 @@ watch(
 
 async function loadDocument(id: string) {
   const current = ++latestLoad;
-  $voice.stop();
+  // Abrir el documento que ya está sonando (p. ej. por lectura automática) no lo corta.
+  if ($voice.state.value.documentId !== id) $voice.stop();
   editing.value = false;
   loading.value = true;
   loadError.value = null;
@@ -230,7 +231,10 @@ function allowLeaving() {
 
 onBeforeRouteLeave(allowLeaving);
 onBeforeRouteUpdate(allowLeaving);
-onBeforeUnmount(() => $voice.stop());
+// Salir de este documento corta su lectura, no la de otro que llegó mientras tanto.
+onBeforeUnmount(() => {
+  if (isReadingThis.value) $voice.stop();
+});
 </script>
 
 <template>
@@ -392,6 +396,7 @@ onBeforeUnmount(() => $voice.stop());
 
     <template #footer>
       <LiveVoiceBar v-if="isReadingThis" />
+      <LiveVoiceBar v-else-if="$voice.state.value.documentId" shows-document />
     </template>
   </WorkspacePage>
 </template>

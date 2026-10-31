@@ -29,6 +29,9 @@ export interface VoiceOption {
   label: string;
 }
 
+/** Qué documentos nuevos se leen solos: ninguno, los de agentes o todos. */
+export type AutoReadMode = 'off' | 'agent' | 'all';
+
 export interface VoicePreferences {
   voiceName: string | null;
   rate: number;

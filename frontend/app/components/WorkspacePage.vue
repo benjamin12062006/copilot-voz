@@ -39,7 +39,10 @@ withDefaults(
         <slot />
       </div>
 
-      <slot name="footer" />
+      <!-- Por defecto, la lectura en curso (p. ej. automática) se controla desde cualquier vista. -->
+      <slot name="footer">
+        <LiveVoiceBar v-if="$voice.state.value.documentId" shows-document />
+      </slot>
     </template>
   </UDashboardPanel>
 </template>

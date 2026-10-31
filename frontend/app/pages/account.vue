@@ -72,6 +72,7 @@ const dataSourceLabel = computed(() =>
         <dd class="text-sm text-default">{{ dataSourceLabel }}</dd>
       </div>
     </dl>
+    <AutoReadSettings v-if="user" />
     <AccountStorage v-if="user" />
   </WorkspacePage>
 </template>

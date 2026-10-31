@@ -2,6 +2,14 @@
 import { SPEECH_RATES } from '../services/live-voice';
 import type { LiveVoiceStatus } from '../types/voice';
 
+withDefaults(
+  defineProps<{
+    /** Muestra qué documento suena, para cuando se lee desde otra vista. */
+    showsDocument?: boolean;
+  }>(),
+  { showsDocument: false },
+);
+
 const { $voice } = useNuxtApp();
 const voice = $voice.state;
 
@@ -95,6 +103,25 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
     class="sticky bottom-0 z-10 border-t border-default bg-default/92 backdrop-blur"
   >
     <div class="mx-auto flex max-w-4xl flex-col gap-3 px-5 py-3 sm:px-12">
+      <div
+        v-if="showsDocument"
+        class="flex items-center justify-between gap-3 text-sm"
+      >
+        <NuxtLink
+          :to="`/voice/${voice.documentId}`"
+          class="truncate font-medium text-default hover:underline"
+        >
+          {{ voice.title }}
+        </NuxtLink>
+        <UButton
+          label="Detener"
+          icon="i-lucide-square"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          @click="$voice.stop()"
+        />
+      </div>
       <!-- Subtítulo en vivo: lo que se está diciendo ahora mismo. -->
       <p
         v-if="voice.segmentText"
