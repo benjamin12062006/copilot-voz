@@ -1,7 +1,7 @@
 # 11 — Preferencia de lectura automática en Turso
 
 Fecha de creación: 2026-10-31
-Estado: Implementado, pendiente de verificación en producción
+Estado: Implementado y verificado
 Ámbito: backend FastAPI, Turso y frontend
 Relacionada con: [frontend 04](../frontend/04-lectura-automatica-localhost.md), [plan frontend 07](../../docs/plans/frontend/07-lectura-automatica.md), [retención en Turso](08-retencion-borrado-y-migracion-turso.md)
 Revisión de partida: `d5c781b`
@@ -35,3 +35,10 @@ El usuario probó en localhost la lectura automática guardada en el navegador y
 ## Despliegue
 
 Se eligió GitHub Actions en lugar de la CLI de Vercel: ejecuta las pruebas antes de publicar y es el flujo ya verificado en las entradas [10](10-fastapi-vercel-y-actions.md) y [frontend 03](../frontend/03-despliegue-vercel-y-cors.md). La migración se aplicó antes del push, para que la API nueva encontrara la tabla.
+
+Resultado sobre `491a6e5`:
+
+- Terminaron correctamente la [validación CI](https://github.com/benjamin12062006/copilot-voz/actions/runs/41180299936), el [despliegue del backend](https://github.com/benjamin12062006/copilot-voz/actions/runs/41180299960) y el [despliegue del frontend](https://github.com/benjamin12062006/copilot-voz/actions/runs/41180299921).
+- En producción, `/health` responde 200 y `/api/v1/voice/preferences` sin sesión responde 401, así que la ruta existe y exige autenticación. El frontend responde (302 hacia el acceso).
+
+Queda que el usuario elija el modo en Perfil, con su sesión en producción, y compruebe que se mantiene al recargar.
