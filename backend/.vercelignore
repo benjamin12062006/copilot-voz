@@ -1,0 +1,13 @@
+.env*
+.dev.vars*
+.venv/
+node_modules/
+**/__pycache__/
+*.py[cod]
+tests/
+mcp-clients/
+.deploy-check/
+.wrangler/
+.git/
+.DS_Store
+01-preparacion.md

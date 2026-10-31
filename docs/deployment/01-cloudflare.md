@@ -2,6 +2,7 @@
 
 Fecha de creación: 2026-10-31
 Estado: configuración del repositorio; conexión y despliegue pendientes
+Actualización 2026-10-31: la opción Containers del backend fue sustituida por [FastAPI en Vercel](02-vercel-backend.md). Este documento conserva la configuración histórica; sus pasos de backend ya no deben ejecutarse. El frontend continúa preparado para Workers.
 Relacionada con: [fuentes oficiales](../fonts/21-cloudflare-workers-y-containers.md), [preparación](../../bitacora-construccion/backend/09-preparacion-cloudflare.md)
 Revisión de partida: `3b236c7` (estado previo a configurar Cloudflare).
 

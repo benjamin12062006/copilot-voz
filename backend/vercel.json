@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "fastapi",
+  "git": { "deploymentEnabled": false },
+  "functions": {
+    "app/main.py": {
+      "maxDuration": 60,
+      "excludeFiles": "{tests/**,mcp-clients/**,.env*,.venv/**,node_modules/**,**/__pycache__/**}"
+    }
+  }
+}

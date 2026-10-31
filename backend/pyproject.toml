@@ -12,3 +12,6 @@ dependencies = [
     "upstash-blob>=0.1.0",
     "uvicorn>=0.54.0",
 ]
+
+[tool.vercel]
+entrypoint = "app.main:app"

@@ -24,17 +24,17 @@ uv sync --locked
 uv run --locked uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
-## Cloudflare
+## Despliegue
 
 Configuración preparada para dos servicios del mismo repositorio:
 
 | Servicio | Directorio | Plataforma |
 | --- | --- | --- |
 | `copilot-frontend` | `frontend` | Workers + recursos estáticos |
-| `copilot-backend` | `backend` | Worker + Container Linux |
+| `copilot-backend` | `backend` | Vercel Functions, FastAPI y Python 3.12 |
 
-La [guía de despliegue](docs/deployment/01-cloudflare.md) contiene los comandos exactos, las variables y la conexión con GitHub. El backend usa Containers para conservar su controlador nativo `libsql`; requiere Workers Paid.
+El backend se despliega mediante [GitHub Actions en Vercel](docs/deployment/02-vercel-backend.md), sin Docker ni Containers. Turso y Upstash Blob conservan los datos existentes. El frontend sigue preparado para Cloudflare; su despliegue es una etapa posterior.
 
-GitHub Actions valida ambos componentes y construye/prueba la imagen Docker. El despliegue se realiza mediante la integración nativa Workers Builds cuando se conecte el repositorio en Cloudflare.
+GitHub Actions valida ambos componentes. El workflow de producción del backend ejecuta sus pruebas, obtiene la configuración de Vercel, compila una vez, despliega esos artefactos y comprueba `/health`.
 
-Los archivos `.env`, `.dev.vars`, tokens y credenciales se excluyen de Git y de la imagen Docker. Solo se publican plantillas vacías.
+Los archivos `.env`, `.vercel`, tokens y credenciales se excluyen de Git y del código que se sube a Vercel. Solo se publican plantillas vacías.
