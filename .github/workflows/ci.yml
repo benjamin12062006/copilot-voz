@@ -1,0 +1,77 @@
+name: Validar proyecto
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      # Clave sintética para compilar; no se conecta a una instancia real.
+      NUXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZXhhbXBsZS50ZXN0JA
+      NUXT_PUBLIC_CLERK_KEYLESS_DISABLED: 'true'
+      NUXT_PUBLIC_PREVIEW_SESSION: 'false'
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.5.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: frontend/.node-version
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build:cloudflare
+      - run: pnpm check:cloudflare
+
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.5.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: frontend/.node-version
+          cache: pnpm
+          cache-dependency-path: backend/pnpm-lock.yaml
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: 0.12.1
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck:cloudflare
+      - run: pnpm check:cloudflare
+      - run: uv sync --locked --python 3.12
+      - run: uv run --locked --python 3.12 python -m unittest discover -s tests -v
+      - name: Construir imagen Linux del backend
+        run: docker build --platform linux/amd64 -t copilot-api:ci .
+      - name: Comprobar arranque y salud sin credenciales
+        run: |
+          docker run -d --name copilot-api -p 8000:8000 copilot-api:ci
+          trap 'docker logs copilot-api; docker rm -f copilot-api' EXIT
+          curl --fail --retry 15 --retry-all-errors --retry-delay 2 http://127.0.0.1:8000/health
+          docker exec copilot-api python -c "from pathlib import Path; assert not Path('/app/.env').exists()"

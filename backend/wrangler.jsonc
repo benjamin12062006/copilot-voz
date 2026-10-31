@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "copilot-backend",
+  "main": "cloudflare/worker.ts",
+  "compatibility_date": "2026-10-31",
+  "compatibility_flags": ["nodejs_compat"],
+  "keep_vars": true,
+  "vars": {
+    "COPILOT_ENV": "production",
+    "COPILOT_CORS_ORIGINS": "[\"https://copilot-frontend.benjamin12062006.workers.dev\"]",
+    "COPILOT_STORAGE_NAMESPACE": "copilot/prod",
+    "COPILOT_STORAGE_MAX_DOCUMENT_BYTES": "1048576",
+    "CLERK_AUTHORIZED_PARTIES": "[\"https://copilot-frontend.benjamin12062006.workers.dev\"]"
+  },
+  "observability": { "enabled": true },
+  "containers": [
+    {
+      "class_name": "CopilotApi",
+      "image": "./Dockerfile",
+      "instance_type": "basic",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "COPILOT_API", "class_name": "CopilotApi" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["CopilotApi"] }]
+}

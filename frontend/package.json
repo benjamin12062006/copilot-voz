@@ -10,6 +10,9 @@
     "dev": "nuxt dev --dotenv .env.local --host localhost --port 3000",
     "dev:preview": "NUXT_PUBLIC_PREVIEW_SESSION=true nuxt dev --dotenv .env.local --host localhost --port 3000",
     "build": "nuxt build --dotenv .env.local",
+    "build:cloudflare": "node scripts/require-cloudflare-env.mjs && nuxt build --preset cloudflare_module",
+    "check:cloudflare": "wrangler deploy --dry-run --outdir .deploy-check",
+    "deploy:cloudflare": "wrangler deploy",
     "preview": "nuxt preview --dotenv .env.local --host localhost --port 3000",
     "postinstall": "nuxt prepare --dotenv .env.local",
     "typecheck": "nuxt typecheck --dotenv .env.local",
@@ -34,7 +37,8 @@
     "prettier": "3.9.10",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
-    "vue-tsc": "3.3.13"
+    "vue-tsc": "3.3.13",
+    "wrangler": "4.156.0"
   },
   "devEngines": {
     "runtime": {
