@@ -70,10 +70,17 @@ function refreshOnFocus() {
   void library.refresh();
 }
 
-onMounted(() => {
-  void library.refresh();
-  window.addEventListener('focus', refreshOnFocus);
-});
+// Al recargar la página, el layout aparece antes de que la sesión esté lista:
+// la biblioteca se carga cuando hay usuario, y otra vez si cambia de cuenta.
+watch(
+  () => user.value?.id,
+  (userId) => {
+    if (userId) void library.refresh();
+  },
+  { immediate: true },
+);
+
+onMounted(() => window.addEventListener('focus', refreshOnFocus));
 onBeforeUnmount(() => window.removeEventListener('focus', refreshOnFocus));
 </script>
 

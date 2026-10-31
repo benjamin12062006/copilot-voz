@@ -22,6 +22,8 @@ const today = new Intl.DateTimeFormat('es', {
   month: 'long',
 }).format(new Date());
 
+const isLibraryEmpty = computed(() => library.documents.value.length === 0);
+
 const recentDocuments = computed(() =>
   library.documents.value
     .filter((document) => document.origin === 'web')
@@ -64,11 +66,19 @@ const agentDocuments = computed(() =>
       :actions="[{ label: 'Reintentar', onClick: () => library.refresh() }]"
     />
 
+    <!-- El aviso grande solo cuando no hay ningún documento, de nadie. -->
+    <UEmpty
+      v-else-if="isLibraryEmpty"
+      icon="i-lucide-file-plus"
+      title="Todavía no tienes documentos"
+      description="Crea uno o importa un archivo para escucharlo."
+      :actions="[{ label: 'Nuevo documento', to: '/voice/new' }]"
+      variant="naked"
+    />
+
     <div v-else class="space-y-10">
       <section aria-labelledby="recientes">
-        <h2 id="recientes" class="focus-section-label mb-1">
-          Continúa escuchando
-        </h2>
+        <h2 id="recientes" class="focus-section-label mb-1">Creados por ti</h2>
         <ul v-if="recentDocuments.length">
           <DocumentRow
             v-for="document in recentDocuments"
@@ -76,14 +86,15 @@ const agentDocuments = computed(() =>
             :document="document"
           />
         </ul>
-        <UEmpty
-          v-else
-          icon="i-lucide-file-plus"
-          title="Todavía no tienes documentos"
-          description="Crea uno o importa un archivo para escucharlo."
-          :actions="[{ label: 'Nuevo documento', to: '/voice/new' }]"
-          variant="naked"
-        />
+        <p v-else class="py-3 text-sm text-muted">
+          Aún no has creado ni importado documentos.
+          <NuxtLink
+            to="/voice/new"
+            class="text-primary underline-offset-2 hover:underline"
+          >
+            Crear uno
+          </NuxtLink>
+        </p>
       </section>
 
       <section aria-labelledby="agentes">
