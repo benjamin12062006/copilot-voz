@@ -1,21 +1,20 @@
-import { accessRoute } from '../utils/access-route';
+import { accessRoute, isGuardedPath } from '../utils/access-route';
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  // Older Flow configurations return to /; preserve their callback parameters.
+  // Flujos de acceso antiguos vuelven a /: conservar sus parámetros de callback.
   if (to.path === '/') {
     return navigateTo({ path: '/auth', query: to.query }, { replace: true });
   }
-  if (
-    import.meta.server ||
-    !['/', '/auth', '/account', '/session'].includes(to.path)
-  )
-    return;
-  // SSR and the first client render must show the same loading markup.
-  // Session restoration begins only after hydration in the client plugin.
+  if (import.meta.server || !isGuardedPath(to.path)) return;
+
+  // El SSR y el primer render del cliente deben mostrar el mismo marcado de
+  // carga; la sesión se restaura tras la hidratación, en el plugin de acceso.
   if (useNuxtApp().isHydrating) return;
+
   const { state, actions } = useAccess();
   await actions.start();
-  const destination = accessRoute(state.value);
-  if (to.path !== destination)
+  const destination = accessRoute(state.value, to.path);
+  if (to.path !== destination) {
     return navigateTo(destination, { replace: true });
+  }
 });

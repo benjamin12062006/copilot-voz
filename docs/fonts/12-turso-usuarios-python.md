@@ -1,8 +1,8 @@
 # 12 — Turso para usuarios desde Python
 
 Fecha de creación: 2026-10-30
-Última actualización: 2026-10-30
-Estado: Investigación; conexión pendiente
+Última actualización: 2026-10-31
+Estado: Driver libSQL integrado; SELECT 1 remoto confirmado; migración pendiente
 Relacionada con: [API usuarios](../plans/02-api-identidad-y-usuarios.md), [historial recuperado](13-antecedentes-api-recuperados.md)
 
 Tipo de fuente: documentación oficial y antecedentes de código propio. Consulta: 2026-10-30.
@@ -16,7 +16,7 @@ F1 — [Python Quickstart](https://docs.turso.tech/sdk/python/quickstart), secci
 
 F2 — [Python reference](https://docs.turso.tech/sdk/python/reference): confirmar parámetros y API DB-API del paquete elegido. `pyturso` se orienta a uso local/embebido; no escogerlo por nombre para una base remota sin verificar.
 
-La base aún no se ha elegido/conectado. No instalar ambos drivers ni inventar un endpoint. Variables de servidor: `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN`.
+Actualización API 02: libsql 0.1.11 instalado y SELECT 1 remoto correcto. La URL configurada identifica database-estadistica-forms; no se ha confirmado como la base exclusiva de Copilot ni se ha migrado. Se mantiene un solo driver. Ver [implementación actual](../../bitacora-construccion/backend/05-api-usuarios-turso.md). Variables de servidor: `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN`.
 
 F3 — [SQL de usuarios recuperado](13-antecedentes-api-recuperados.md): identidad separada del proveedor y restricción única issuer/subject. Adaptación propia a repositorio Python, SQL parametrizado y migraciones versionadas; sin Prisma ni sintaxis PostgreSQL.
 

@@ -23,3 +23,5 @@ FastAPI prepara documentos y genera audio; Nuxt reproduce y contiene toda la int
 El MCP de nuestra app recibe contenido desde agentes y consulta documentos/trabajos. Su adaptador stdio usa rutas de agente con credencial limitada y propietario fijo, y reutiliza servicios de FastAPI. No expone shell ni archivos arbitrarios. El token de servicio es una propuesta personal de alcance acotado; un MCP HTTP externo requeriría su propio diseño de autorización compatible, no copiar esa credencial como solución universal.
 
 No se definen herramientas para pausar/reanudar/reiniciar. Esas acciones ocurren en Nuxt sobre su HTMLAudioElement y no llaman al servidor. La integración Codex/Claude y el flujo de documento enviado están en la [ficha 15](15-conexion-mcp-codex-y-claude.md) y [API 04](../plans/04-api-voz-y-mcp.md).
+
+Actualización 2026-10-31: se implementó una sola herramienta de envío. El propietario fijo propuesto se sustituyó por tokens personales emitidos tras validar Clerk, asociados a usuarios en Turso. Ver [bitácora 07](../../bitacora-construccion/backend/07-tokens-personales-y-textos-por-usuario.md).

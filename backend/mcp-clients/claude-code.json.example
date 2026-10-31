@@ -10,7 +10,7 @@
         "--locked",
         "python",
         "-m",
-        "app.mcp.stdio"
+        "app.mcp_server"
       ],
       "env": {
         "COPILOT_MCP_ENV_FILE": "/Users/benji/Documents/Copilot/backend/mcp-clients/.env"

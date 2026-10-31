@@ -1,8 +1,8 @@
 # 05 — Frontend Nuxt: acceso, diseño y reproductor
 
 Fecha de creación: 2026-10-30
-Última actualización: 2026-10-30
-Estado: Plan
+Última actualización: 2026-10-31
+Estado: En curso — dividido en [subplanes](frontend/01-tema-focus-y-espacio-de-trabajo.md); pantallas con datos simulados en [bitácora frontend 01](../../bitacora-construccion/frontend/01-pantallas-focus-nuxt-ui-y-clerk.md)
 Relacionada con: [base y cursos](../fonts/11-base-nuxt-y-cursos.md), [Focus](../fonts/06-estilo-visual-focus-macos.md), [estados](../diagrams/03-estados-de-reproduccion.md)
 
 ## Condición de entrada

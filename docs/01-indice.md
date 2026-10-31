@@ -1,9 +1,9 @@
 # 01 — Copilot: API primero, frontend después
 
 Fecha de creación: 2026-10-30
-Última actualización: 2026-10-30
+Última actualización: 2026-10-31
 Estado: Planificación vigente; preparación parcial implementada
-Relacionada con: [registro del cambio](../bitacora-construccion/03-base-web-y-orden-api-frontend.md)
+Relacionada con: [registro del cambio](../bitacora-construccion/backend/03-base-web-y-orden-api-frontend.md)
 
 La aplicación será web: Nuxt 4 + Vue 3 + TypeScript con pnpm, y una API Python con FastAPI y uv. Clerk gestiona identidad, Turso guarda usuarios y Upstash Blob privado guarda documentos. El backend preparará Markdown y sintetizará audio; el navegador lo reproducirá. Esta es la decisión vigente del usuario.
 
@@ -22,8 +22,8 @@ Ejecutar cada plan en este orden. Las comprobaciones de aceptación son trabajo 
 ## Estado real
 
 - `frontend/`: copia de estadistica-forms-web, renombrada copilot-web y adaptada de Descope a Clerk. Conserva organización y pantallas de acceso/cuenta. El panel Voz con estilo Focus todavía no existe.
-- `backend/`: entorno uv y API 01 implementada: configuración validada, contrato de errores, request ID, CORS y `GET /health` ([bitácora 04](../bitacora-construccion/04-api-base-y-configuracion.md)). Todavía no hay rutas de producto, conexión Turso, verificación JWT, parser ni motor de voz.
-- `docs/` y `bitacora-construccion/`: documentación compartida en la raíz. La skill [construir-con-evidencia](../.agents/skills/construir-con-evidencia/SKILL.md) está en la raíz del proyecto, dentro de `.agents/skills`.
+- `backend/`: entorno uv y API 01 implementada: configuración validada, contrato de errores, request ID, CORS y `GET /health` ([bitácora 04](../bitacora-construccion/backend/04-api-base-y-configuracion.md)). API 02 añade las tres rutas de identidad/perfil, verificación JWT con clave pública y repositorio Turso ([bitácora 05](../bitacora-construccion/backend/05-api-usuarios-turso.md)). Hay 11 pruebas locales correctas y SELECT 1 remoto confirmado; falta confirmar la base exclusiva, migrarla y probar una sesión real. Parser y voz siguen pendientes.
+- `docs/`: documentación compartida. `bitacora-construccion/backend/` registra API, datos y proveedores; `bitacora-construccion/frontend/` registra la interfaz. Cada carpeta tiene su propia secuencia. La skill [construir-con-evidencia](../.agents/skills/construir-con-evidencia/SKILL.md) está en la raíz del proyecto, dentro de `.agents/skills`.
 - Plugins Upstash y Turso instalados y habilitados para este proyecto; autenticación OAuth y recursos remotos pendientes.
 
 ## Contratos y fuentes

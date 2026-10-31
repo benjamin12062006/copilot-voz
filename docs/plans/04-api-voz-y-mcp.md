@@ -1,9 +1,15 @@
 # 04 — API: síntesis de voz y conexión MCP
 
 Fecha de creación: 2026-10-30
-Última actualización: 2026-10-30
+Última actualización: 2026-10-31
 Estado: Plan
 Relacionada con: [voz y MCP](../fonts/14-voz-python-y-mcp.md), [clientes](../fonts/15-conexion-mcp-codex-y-claude.md), [secuencia](../diagrams/02-guardar-y-reproducir.md)
+
+## Alcance MCP actualizado
+
+Por instrucción del usuario se implementa **una sola herramienta**: `voice_submit_document(title, markdown, idempotency_key)`. El SDK oficial MCP 2.3.0 usa MCPServer y stdio; el adaptador llama `POST /api/v1/agent/documents` con token limitado. La API resuelve el propietario con un token personal almacenado como hash en Turso y solo guarda Markdown; no existen herramientas de listado, estado o audio. Esto sustituye la propuesta B.5 de tres herramientas y `generateAudio`.
+
+Handshake y tools/list reales comprobados; llamada de herramienta → API → biblioteca comprobada con transporte HTTP controlado. Guardado/lectura/ETag comprobados en Blob remoto con un objeto temporal propio, retirado al terminar. No se registró automáticamente el servidor en clientes ni se generó audio. [Bitácora 06](../../bitacora-construccion/backend/06-biblioteca-blob-y-envio-mcp.md).
 
 ## Objetivo
 
@@ -24,7 +30,7 @@ Nuxt descargará el audio autorizado como Blob y creará un Object URL; así `HT
 1. Añadir SDK oficial Python MCP y fijar su versión comprobando su API estable. Crear un adaptador stdio que llame a nuestra API FastAPI; no duplicar documentos, parser ni motor.
 2. Primer transporte: stdio local lanzado por Codex/Claude Code, con stdout reservado al protocolo y logs por stderr. FastAPI corre como servicio separado. La integración es propia, distinta de los plugins Turso/Upstash instalados para administrar proveedores.
 3. El adaptador carga configuración privada desde un archivo dedicado, ignorado por Git, que contiene URL de API y token de servicio limitado a voz/documentos. No entregar a un proceso MCP las claves de Turso, Blob o Clerk.
-4. La API acepta esta credencial solo en rutas de agente acotadas: identidad de propietario fija configurada en servidor, usuario local ya creado en API 02, scopes explícitos y token revocable. No aceptar ownerId de argumentos del agente. Propuesta: `COPILOT_MCP_TOKEN_SHA256` en backend; token aleatorio original solo en archivo privado del adaptador. No reutilizar un JWT de Clerk de otro recurso.
+4. La API acepta esta credencial solo en rutas de agente acotadas: identidad de propietario obtenida de Turso por token personal, usuario local vinculado a Clerk, permiso fijo documents:submit y token revocable con caducidad de 30 días. No aceptar ownerId de argumentos del agente. Implementado: POST /api/v1/mcp/tokens con sesión Clerk emite una credencial mostrada una vez; GET lista metadata y DELETE revoca solo tokens propios. El hash queda en Turso; ya no hay token global ni propietario fijo en variables de entorno. [Contrato del botón web](../../bitacora-construccion/backend/07-tokens-personales-y-textos-por-usuario.md). No reutilizar un JWT de Clerk de otro recurso.
 5. Publicar estas herramientas con schemas y resultados estructurados:
 
 | Herramienta | Entrada | Resultado |

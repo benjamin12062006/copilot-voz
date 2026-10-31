@@ -1,7 +1,7 @@
 # 10 — Clerk: identidad Nuxt y verificación Python
 
 Fecha de creación: 2026-10-30
-Última actualización: 2026-10-30
+Última actualización: 2026-10-31
 Estado: Investigación y adaptación frontend
 Relacionada con: [base Nuxt](11-base-nuxt-y-cursos.md), [plan usuarios](../plans/02-api-identidad-y-usuarios.md)
 
@@ -22,3 +22,7 @@ Frontend origen: `/Users/benji/Documents/KSuT/estadistica-forms-web`, revisión 
 Referencia de contratos backend: `/Users/benji/Documents/KSuT/claudeLearningAllPosibolIt`, HEAD `1f0be2d2e1b5c88f81eff801418cc739a543e0cb`, árbol de trabajo consultado. [UsersController](/Users/benji/Documents/KSuT/claudeLearningAllPosibolIt/src/users/users.controller.ts), `getCurrentUser`/`provisionCurrentUser`: identidad del guard y envoltorio GET/PUT `{user}`. [UsersService](/Users/benji/Documents/KSuT/claudeLearningAllPosibolIt/src/users/users.service.ts), `findCurrent`: perfil ausente como error. [UsersRepository](/Users/benji/Documents/KSuT/claudeLearningAllPosibolIt/src/users/users.repository.ts), `provision`/`findByIdentity`: UUID local y unicidad por emisor/sujeto. Interpretación: reutilizar contratos y responsabilidades, implementando validación Python; no copiar Nest como runtime ni atribuir todo el árbol de trabajo al commit indicado.
 
 Estado real: módulo, componente y adaptador Clerk preparados en frontend. Faltan claves y backend autenticado, por lo que no hay login real de extremo a extremo comprobado. [API 02](../plans/02-api-identidad-y-usuarios.md) detalla validación y proyección en Turso.
+
+## Decisión aplicada en API 02
+
+Por instrucción posterior del usuario, Clerk solo emite token/ID: el backend verifica con clave pública, sin secret key ni consulta Backend User. Email y nombre quedan null. La evidencia vigente está en [fuente 17](17-api-minima-turso-y-token.md) y [bitácora backend 05](../../bitacora-construccion/backend/05-api-usuarios-turso.md). La investigación de SDK/perfil anterior se conserva como antecedente, no como comportamiento implementado.

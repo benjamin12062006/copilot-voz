@@ -35,14 +35,11 @@ class Feature(StrEnum):
 # API 02–04 pueden ajustar su lista al elegir el mecanismo concreto.
 FEATURE_REQUIREMENTS: Final[dict[Feature, tuple[str, ...]]] = {
     Feature.IDENTITY: (
-        "clerk_secret_key",
         "clerk_issuer",
-        "clerk_authorized_parties",
-        "allowed_clerk_user_ids",
     ),
     Feature.USERS: ("turso_database_url", "turso_auth_token"),
     Feature.DOCUMENTS: ("upstash_blob_token",),
-    Feature.AGENTS: ("mcp_token_sha256", "mcp_owner_id"),
+    Feature.AGENTS: ("turso_database_url", "turso_auth_token"),
 }
 
 
@@ -82,8 +79,6 @@ class Settings(BaseSettings):
         validation_alias="COPILOT_STORAGE_MAX_DOCUMENT_BYTES",
     )
 
-    mcp_token_sha256: SecretStr | None = Field(default=None, validation_alias="COPILOT_MCP_TOKEN_SHA256")
-    mcp_owner_id: str | None = Field(default=None, validation_alias="COPILOT_MCP_OWNER_ID")
 
     @field_validator("cors_origins", "clerk_authorized_parties")
     @classmethod
@@ -93,6 +88,29 @@ class Settings(BaseSettings):
                 # Sin el valor: el mensaje puede acabar en logs de arranque.
                 raise ValueError("cada origen debe ser esquema://host[:puerto], sin ruta ni comodín")
         return origins
+
+    @field_validator("turso_database_url")
+    @classmethod
+    def require_remote_libsql(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        parts = urlsplit(value)
+        is_remote_database = (
+            parts.scheme == "libsql"
+            and bool(parts.hostname)
+            and not (parts.username or parts.password or parts.query or parts.fragment)
+            and parts.path in ("", "/")
+        )
+        if not is_remote_database:
+            raise ValueError("debe ser una URL libsql:// remota, sin credenciales ni parámetros")
+        return value
+
+    @field_validator("clerk_issuer")
+    @classmethod
+    def require_clerk_origin(cls, value: str | None) -> str | None:
+        if value is not None and not (is_exact_origin(value) and value.startswith("https://")):
+            raise ValueError("debe ser el origen HTTPS exacto de la instancia")
+        return value
 
     def require(self, feature: Feature) -> None:
         missing = self.missing_for(feature)

@@ -1,48 +1,72 @@
 <script setup lang="ts">
 const { state, actions } = useAccess();
-const active = computed(() => state.value.status === 'authenticating');
+const { $accessProvider } = useNuxtApp();
+
+const authenticating = computed(() => state.value.status === 'authenticating');
+const showsClerkForm = computed(
+  () => authenticating.value && $accessProvider === 'clerk',
+);
+
 onBeforeRouteLeave(() => {
-  if (active.value) actions.cancelSignIn();
+  if (authenticating.value) actions.cancelSignIn();
 });
 </script>
 
 <template>
-  <div v-if="state.status === 'signedOut' || state.status === 'authenticating'">
-    <p class="eyebrow">Tu espacio personal</p>
-    <h1
-      class="mt-4 text-[29px] leading-tight tracking-[-0.015em] sm:text-[32px]"
-    >
-      {{ active ? 'Entra a Copilot.' : 'Qué bueno verte.' }}
+  <div v-if="state.status === 'signedOut' || authenticating">
+    <h1 class="focus-title text-[2.25rem]! sm:text-[2.5rem]!">
+      {{ authenticating ? 'Entra a Copilot' : 'Qué bueno verte' }}
     </h1>
-    <p class="mt-4 text-lg leading-relaxed">
-      Entra o crea tu cuenta para comenzar.
+    <p class="mt-3 text-base text-muted">
+      Escucha tus documentos con una voz clara. Pausa, continúa y vuelve a
+      empezar cuando quieras.
     </p>
-    <template v-if="active">
+
+    <div v-if="showsClerkForm" class="mt-7">
       <ClientOnly><ClerkAccess /></ClientOnly>
-      <div class="mt-6 flex justify-center">
-        <button type="button" class="action-text" @click="actions.cancelSignIn">
-          Cancelar
-        </button>
-      </div>
-    </template>
+      <UButton
+        label="Cancelar"
+        color="neutral"
+        variant="ghost"
+        block
+        class="mt-4"
+        @click="actions.cancelSignIn"
+      />
+    </div>
+
     <template v-else>
-      <AppIcon name="fingerprint" class="mx-auto mt-10 mb-9 size-16" />
-      <button type="button" class="action-primary" @click="actions.beginSignIn">
-        <AppIcon name="arrow" class="size-5" />Continuar
-      </button>
+      <ul class="mt-7 border-t border-default text-sm">
+        <li class="flex items-center gap-3 border-b border-default py-2.5">
+          <UIcon name="i-lucide-file-text" class="size-4 text-muted" />
+          Importa Markdown o texto
+        </li>
+        <li class="flex items-center gap-3 border-b border-default py-2.5">
+          <UIcon name="i-lucide-audio-lines" class="size-4 text-muted" />
+          Escucha con controles de reproducción
+        </li>
+        <li class="flex items-center gap-3 border-b border-default py-2.5">
+          <UIcon name="i-lucide-bot" class="size-4 text-muted" />
+          Recibe documentos de tus agentes
+        </li>
+      </ul>
+
+      <UButton
+        label="Continuar"
+        trailing-icon="i-lucide-arrow-right"
+        size="lg"
+        block
+        class="mt-8"
+        :loading="authenticating"
+        @click="actions.beginSignIn"
+      />
       <p
         v-if="state.status === 'signedOut' && state.notice"
         role="status"
-        class="mt-4 text-sm leading-relaxed text-muted"
+        class="mt-4 text-sm text-muted"
       >
         {{ state.notice }}
       </p>
     </template>
-    <footer
-      class="mt-10 border-t border-muted/30 pt-6 text-center text-sm text-muted"
-    >
-      Tu cuenta, bajo tu control.
-    </footer>
   </div>
   <SessionProgress v-else />
 </template>

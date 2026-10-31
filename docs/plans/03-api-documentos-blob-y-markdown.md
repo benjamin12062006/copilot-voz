@@ -1,9 +1,19 @@
 # 03 — API: documentos Blob y preparación Markdown
 
 Fecha de creación: 2026-10-30
-Última actualización: 2026-10-30
-Estado: Plan
+Última actualización: 2026-10-31
+Estado: Almacenamiento y preparación implementados; frontend sin conectar
 Relacionada con: [Blob](../fonts/09-upstash-blob-y-herramientas.md), [Markdown](../fonts/08-markdown-pantalla-y-voz.md)
+
+## Decisión vigente del usuario
+
+La implementación sigue los campos actuales del frontend: `content`, `format: markdown | text`, revisión numérica y `notices`. Se limita la biblioteca a los últimos 20 documentos guardados por propietario; al entrar el 21 se retira el más antiguo por orden de guardado, incluida la edición. Esto sustituye expresamente la política anterior de no retención automática.
+
+Actualización por usuario: cada versión original también se guarda como archivo privado en `<namespace>/textos/<userId>/<fileId>.md` o `.txt`. La biblioteca JSON mantiene originales, metadata y referencias a versiones; ETag confirma qué documentos están visibles. Al reemplazar o retirar un archivo se registra su eliminación pendiente en la misma escritura, luego se borra únicamente ese archivo. Si el proveedor falla, el guardado devuelve error y el siguiente intento reanuda la limpieza. No se confirma éxito hasta completar la limpieza. Un fallo incierto entre escribir un archivo y confirmar la biblioteca puede dejar un archivo sin referenciar; no se promete transacción entre objetos Blob. Ver [bitácora 07](../../bitacora-construccion/backend/07-tokens-personales-y-textos-por-usuario.md).
+
+La revisión numérica pertenece a cada documento; ETag solo controla internamente el objeto de biblioteca. Listado devuelve `{items,nextCursor:null}` porque está acotado. Rutas de preparación reciben `?revision=N`. El MCP admite solo Markdown y comparte este almacenamiento. Idempotencia durable mientras el documento permanezca retenido; una clave cuyo documento ya fue retirado puede crear de nuevo el documento.
+
+Comprobaciones y código: [bitácora backend 06](../../bitacora-construccion/backend/06-biblioteca-blob-y-envio-mcp.md). El resto del plan conserva antecedentes y objetivos de evolución; no reemplaza esta decisión aplicada.
 
 ## Objetivo
 
@@ -25,7 +35,7 @@ Después de usuarios autenticados, guardar documentos privados y obtener una rep
 | `PUT /api/v1/documents/{id}` | Body con título, formato, original y revision requerida; `{document}` o 409. |
 | `GET /api/v1/documents/{id}/prepared` | `{prepared}` con bloques, texto hablado y avisos. |
 
-Aplazar borrar/exportar hasta necesitarlos; nunca añadir retención automática destructiva. Un recurso ajeno responde 404. No devolver el token ni permitir rutas arbitrarias del bucket.
+Exportar y borrado manual se aplazan. La retención automática de 20 fue solicitada posteriormente por el usuario; ver decisión vigente. Un recurso ajeno responde 404. No devolver el token ni permitir rutas arbitrarias del bucket.
 
 La entrada MCP del paso 04 necesita idempotencia durable del guardado: asociar la clave al propietario, derivar un ID estable de documento y usar creación sin sobrescritura; ante repetición comprobar fingerprint del contenido. Una clave repetida con otro contenido es conflicto. Definir longitud/caducidad de claves y verificar recuperación tras reiniciar el proceso antes de prometer esta garantía. No guardar un índice adicional de documentos en Turso.
 

@@ -6,10 +6,10 @@ withDefaults(defineProps<{ message?: string }>(), {
 
 <template>
   <div role="status" aria-live="polite" class="py-10 text-center">
-    <span
-      aria-hidden="true"
-      class="mx-auto mb-6 block size-9 animate-spin rounded-full border-2 border-sage border-t-ink motion-reduce:animate-none"
+    <UIcon
+      name="i-lucide-loader-circle"
+      class="mx-auto mb-5 size-8 animate-spin text-muted motion-reduce:animate-none"
     />
-    <p class="text-lg">{{ message }}</p>
+    <p class="text-base text-toned">{{ message }}</p>
   </div>
 </template>

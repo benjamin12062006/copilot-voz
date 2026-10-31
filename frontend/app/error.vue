@@ -1,27 +1,30 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app';
-defineProps<{ error: NuxtError }>();
+
+const props = defineProps<{ error: NuxtError }>();
+
+const title = computed(() =>
+  props.error.statusCode === 404
+    ? 'Esta página no está aquí'
+    : 'Algo interrumpió el camino',
+);
 </script>
 
 <template>
-  <NuxtLayout>
-    <p class="eyebrow">Copilot</p>
-    <h1 class="mt-5 text-3xl">
-      {{
-        error.statusCode === 404
-          ? 'Esta página no está aquí.'
-          : 'Algo interrumpió el camino.'
-      }}
-    </h1>
-    <p class="mt-4 leading-relaxed">
-      Puedes volver a tu cuenta y continuar desde allí.
-    </p>
-    <button
-      type="button"
-      class="action-primary mt-8"
-      @click="clearError({ redirect: '/auth' })"
-    >
-      Volver al inicio
-    </button>
-  </NuxtLayout>
+  <UApp>
+    <NuxtLayout>
+      <h1 class="focus-title text-[2rem]!">{{ title }}</h1>
+      <p class="mt-3 text-base text-muted">
+        Puedes volver al inicio y continuar desde allí.
+      </p>
+      <UButton
+        label="Volver al inicio"
+        icon="i-lucide-house"
+        size="lg"
+        block
+        class="mt-7"
+        @click="clearError({ redirect: '/home' })"
+      />
+    </NuxtLayout>
+  </UApp>
 </template>

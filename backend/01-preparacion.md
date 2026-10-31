@@ -1,26 +1,41 @@
-# 01 — Entorno del backend FastAPI
+# 01 — API FastAPI
 
 Fecha de creación: 2026-10-30
-Última actualización: 2026-10-30
-Estado: Entorno preparado; API 01 implementada
-Relacionada con: [orden de trabajo](../docs/01-indice.md), [clientes MCP](../docs/fonts/15-conexion-mcp-codex-y-claude.md)
+Última actualización: 2026-10-31
+Estado: API mínima implementada; migración remota pendiente
+Relacionada con: [plan 02](../docs/plans/02-api-identidad-y-usuarios.md), [bitácora backend](../bitacora-construccion/backend/05-api-usuarios-turso.md)
 
-## Preparado
+## Ejecutar desde backend/
 
-`pyproject.toml`, `uv.lock`, `.python-version` y entorno `.venv` aislado. Dependencias: FastAPI, uvicorn, pydantic-settings y upstash-blob. `uv sync --locked --offline` y los imports del entorno se ejecutaron correctamente después de separar esta carpeta del frontend.
+```bash
+uv sync --locked
+uv run --locked uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
+```
 
-## Pendiente de implementar
+GET /health comprueba el proceso. GET /api/v1/auth/me verifica el token recibido; GET/PUT /api/v1/users/me leen o crean el perfil. Email/nombre son null en esta etapa; no se consulta Clerk Backend API ni se necesita su secret key.
 
-API 01 añadió `app/` con configuración, contrato de errores, request ID, CORS y `GET /health` ([bitácora 04](../bitacora-construccion/04-api-base-y-configuracion.md)). Aún no existen rutas de producto, conexión Turso, verificación Clerk, parser Markdown, motor de voz ni servidor MCP propio. Ejecutar los planes [01](../docs/plans/01-api-base-y-configuracion.md) a [04](../docs/plans/04-api-voz-y-mcp.md) antes de desarrollar el panel Nuxt.
+## Configuración mínima
 
-## Configuración
+TURSO_DATABASE_URL y TURSO_AUTH_TOKEN conectan la base libSQL remota. CLERK_ISSUER es el origen público confiable del emisor del token; desde ahí se consulta su JWKS público. Las variables existentes de public key, orígenes específicos e IDs permitidos son opcionales. Las credenciales reales permanecen en .env ignorado por Git.
 
-`.env.example` describe los nombres previstos para cada etapa; los nombres COPILOT son nuestros y deberán cargarse/validarse al implementar Settings. `.env` real está ignorado; no se publican claves ni se confía en que uv cargue por sí solo el archivo. Completar valores solo localmente o en el entorno de despliegue.
+```bash
+uv run --locked python -m app.database
+uv run --locked python -m app.migrations
+uv run --locked python -m app.migrations --apply
+```
 
-Para API 02: aplicación Clerk, issuer, authorized parties, IDs personales permitidos y credenciales de la base Turso elegida. Para API 03: bucket privado Upstash y token. Para API 04: modelo/voz aprobados tras escuchar muestras y credencial limitada de agente, con hash en API y token original solo en archivo privado del adaptador.
+El primer comando ejecuta SELECT 1; el segundo comprueba esquema sin escribir; --apply aplica la migración manual, transaccional y registrada. El servidor nunca migra al arrancar. Usar una base exclusiva de Copilot.
 
-## Comandos válidos hoy
+## Verificación
 
-Desde `backend/`: `uv sync --locked` y `uv run --locked python -c "import fastapi, pydantic_settings, upstash_blob"`. Arrancar la API: `uv run --locked uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log`. El módulo stdio de las plantillas MCP será válido cuando se implemente.
+```bash
+uv run --locked python -m unittest discover -s tests -q
+```
 
-[MCP clientes](mcp-clients/codex.toml.example) contiene solo una plantilla. No se activa contra un módulo ausente. Las comprobaciones de conexión remota requieren configuración real; no se han creado ni modificado recursos remotos.
+11 pruebas locales pasan con libSQL temporal y firmas RSA. La conexión remota SELECT 1 fue correcta, pero la URL actual identifica database-estadistica-forms; su inspección fue rechazada por revisión automática. No se aplicó DDL remoto. Falta confirmar la base exclusiva y probar una sesión real; issuer todavía no configurado.
+
+Parser, documentos, voz y MCP pertenecen a planes posteriores. El frontend lo lleva otra IA.
+
+## Tokens MCP personales
+
+Actualización 2026-10-31: el backend ya emite tokens por usuario con sesión Clerk (POST /api/v1/mcp/tokens), lista metadata y permite revocarlos. Se retiró la configuración global de propietario/token. La migración 002 agrega app_mcp_tokens a Turso; el runner aplica 001→002 sin alterar usuarios existentes. El contrato del botón está en [bitácora 07](../bitacora-construccion/backend/07-tokens-personales-y-textos-por-usuario.md). Los originales nuevos se guardan en textos/userId/fileId.md o .txt, con limpieza de versiones retiradas. No se ejecutó la migración en Turso remoto.

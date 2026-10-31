@@ -1,53 +1,80 @@
-@import '@fontsource/roboto/latin-400.css';
-@import '@fontsource/roboto/latin-600.css';
-@import '@fontsource/roboto/latin-700.css';
 @import 'tailwindcss';
+@import '@nuxt/ui';
 
 @theme {
-  --color-ink: #163c32;
-  --color-canvas: #f6f4ed;
-  --color-muted: #63736b;
-  --color-line: #e3e7df;
-  --color-sage: #eaf0e9;
-  --color-terracotta: #dd865b;
-  --font-sans: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  /* SF en macOS, como la referencia; equivalente del sistema en el resto. */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui,
+    sans-serif;
+
+  /* Colores de la cabecera ilustrada, medidos en la captura Focus. */
+  --color-cover-sage: #87b49e;
+  --color-cover-mustard: #d1a560;
+  --color-cover-mauve: #be96a4;
+  --color-cover-blue: #2c82be;
+  --color-cover-lavender: #8674b4;
+  --color-cover-navy: #353f50;
+  --color-cover-peach: #f39e77;
+  --color-cover-orange: #f78440;
+  --color-cover-red: #f54a3c;
+
+  /* Puntos de color de las secciones del lateral («Tags» en la referencia). */
+  --color-dot-red: #ec7363;
+  --color-dot-green: #34c759;
+  --color-dot-blue: #2f8cfa;
+  --color-dot-yellow: #ffd43b;
+  --color-dot-violet: #a78bfa;
+}
+
+/* Variante clara propia: la referencia solo muestra el modo oscuro. */
+:root {
+  --ui-bg: #faf8fb;
+  --ui-bg-muted: #efebf1;
+  --ui-bg-elevated: #e5dfe8;
+  --ui-bg-accented: #d9d2dd;
+  --ui-text: #2b232d;
+  --ui-text-highlighted: #1c161e;
+  --ui-text-toned: #4a404d;
+  --ui-text-muted: #6e6472;
+  --ui-text-dimmed: #8c8290;
+  --ui-border: #e6e0e8;
+  --ui-border-muted: #eee9f0;
+  --ui-border-accented: #cfc6d3;
+  --ui-radius: 0.5rem;
+}
+
+/* Valores medidos en píxeles de docs/fonts/assets/focus-macos-referencia.png. */
+.dark {
+  --ui-bg: #362e38; /* panel principal */
+  --ui-bg-muted: #4c4551; /* lateral */
+  --ui-bg-elevated: #5f5661; /* fila seleccionada */
+  --ui-bg-accented: #6b626d; /* tarjetas «All / Inbox» */
+  --ui-text: #f3eff4;
+  --ui-text-highlighted: #fbf7fb;
+  --ui-text-toned: #c9c1cc;
+  --ui-text-muted: #978d9b;
+  --ui-text-dimmed: #796f7b;
+  --ui-border: #3e3640; /* separadores entre filas */
+  --ui-border-muted: #3a323c;
+  --ui-border-accented: #574f5d;
 }
 
 @layer base {
   body {
-    @apply m-0 bg-canvas font-sans text-ink antialiased;
-  }
-
-  button,
-  a {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  button:enabled {
-    @apply cursor-pointer;
-  }
-
-  :focus-visible {
-    @apply outline-2 outline-offset-4 outline-ink;
+    @apply bg-default text-default antialiased;
   }
 
   ::selection {
-    @apply bg-ink text-white;
+    @apply bg-primary/40;
   }
 }
 
-@utility action-primary {
-  @apply flex min-h-13 w-full items-center justify-center gap-3 rounded-2xl bg-ink px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-ink/90 disabled:cursor-wait disabled:opacity-60;
+/* Título grande y fino de cada vista («Tutorial: Basics»). */
+@utility focus-title {
+  @apply text-4xl leading-tight font-light tracking-tight text-highlighted sm:text-[2.75rem];
 }
 
-@utility action-secondary {
-  @apply flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl border border-muted/70 px-5 py-3 text-base transition-colors hover:bg-sage disabled:cursor-wait disabled:opacity-60;
-}
-
-@utility action-text {
-  @apply inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-base transition-colors hover:bg-sage;
-}
-
-@utility eyebrow {
-  @apply text-[11px] leading-5 font-semibold tracking-[0.16em] text-muted uppercase;
+/* Encabezado pequeño de sección del lateral («Projects», «Tags»). */
+@utility focus-section-label {
+  @apply text-xs font-medium text-dimmed;
 }

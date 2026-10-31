@@ -1,51 +1,77 @@
 <script setup lang="ts">
+definePageMeta({ layout: 'workspace' });
+
 const { state, actions } = useAccess();
-const memberSince = computed(() =>
-  state.value.status === 'ready'
-    ? new Intl.DateTimeFormat('es', {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        timeZone: 'America/New_York',
-      }).format(new Date(state.value.user.createdAt))
-    : '',
+const { $accessProvider } = useNuxtApp();
+const config = useRuntimeConfig().public;
+
+const PROVIDER_LABELS = {
+  clerk: 'Clerk',
+  preview: 'Vista previa local (sin Clerk)',
+  none: 'Sin configurar',
+};
+
+const user = computed(() =>
+  state.value.status === 'ready' ? state.value.user : null,
+);
+
+const memberSince = computed(() => {
+  if (!user.value) return '';
+  return new Intl.DateTimeFormat('es', { dateStyle: 'long' }).format(
+    new Date(user.value.createdAt),
+  );
+});
+
+const dataSourceLabel = computed(() =>
+  config.dataSource === 'api'
+    ? 'Biblioteca conectada · voz del sistema'
+    : 'Datos simulados en este navegador',
 );
 </script>
 
 <template>
-  <div v-if="state.status === 'ready'">
-    <p class="eyebrow">Dentro de tu cuenta</p>
-    <div
-      class="mt-6 flex size-16 items-center justify-center rounded-full bg-sage"
-    >
-      <AppIcon name="user" class="size-7" />
-    </div>
-    <h1
-      class="mt-7 text-[29px] leading-tight tracking-[-0.02em] sm:text-[32px]"
-    >
-      {{ state.user.displayName ?? 'Bienvenido a tu espacio.' }}
-    </h1>
-    <p class="mt-4 text-base leading-relaxed">
-      Tu sesión está activa y tu cuenta está lista.
-    </p>
-    <dl class="mt-6 border-t border-muted/30 pt-6">
-      <dt class="eyebrow">Correo de tu cuenta</dt>
-      <dd class="mt-2 text-base break-words select-text">
-        {{ state.user.email ?? 'Sin correo disponible' }}
-      </dd>
-      <dt class="eyebrow mt-7">Miembro desde</dt>
-      <dd class="mt-2 text-base">
-        <time :datetime="state.user.createdAt">{{ memberSince }}</time>
-      </dd>
+  <WorkspacePage
+    id="cuenta"
+    :title="user?.displayName ?? 'Tu cuenta'"
+    compact-cover
+  >
+    <template #title-actions>
+      <div class="flex gap-2">
+        <ClerkProfileButton v-if="$accessProvider === 'clerk'" />
+        <UButton
+          label="Cerrar sesión"
+          icon="i-lucide-log-out"
+          color="neutral"
+          variant="ghost"
+          @click="actions.signOut"
+        />
+      </div>
+    </template>
+
+    <dl v-if="user">
+      <div class="flex justify-between gap-4 border-b border-default py-3">
+        <dt class="text-sm text-muted">Correo</dt>
+        <dd class="text-sm break-all text-default">
+          {{ user.email ?? 'Sin correo disponible' }}
+        </dd>
+      </div>
+      <div class="flex justify-between gap-4 border-b border-default py-3">
+        <dt class="text-sm text-muted">Miembro desde</dt>
+        <dd class="text-sm text-default">
+          <time :datetime="user.createdAt">{{ memberSince }}</time>
+        </dd>
+      </div>
+      <div class="flex justify-between gap-4 border-b border-default py-3">
+        <dt class="text-sm text-muted">Acceso</dt>
+        <dd class="text-sm text-default">
+          {{ PROVIDER_LABELS[$accessProvider] }}
+        </dd>
+      </div>
+      <div class="flex justify-between gap-4 border-b border-default py-3">
+        <dt class="text-sm text-muted">Documentos y voz</dt>
+        <dd class="text-sm text-default">{{ dataSourceLabel }}</dd>
+      </div>
     </dl>
-    <button
-      type="button"
-      class="action-secondary mt-10"
-      @click="actions.signOut"
-    >
-      <AppIcon name="logout" class="size-5" />
-      Cerrar sesión
-    </button>
-  </div>
-  <SessionProgress v-else />
+    <AccountStorage v-if="user" />
+  </WorkspacePage>
 </template>

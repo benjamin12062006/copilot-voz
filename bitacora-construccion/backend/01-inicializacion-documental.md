@@ -3,7 +3,7 @@
 Fecha de creación: 2026-10-30
 Última actualización: 2026-10-30
 Estado: Investigación histórica; planificación sustituida
-Relacionada con: [índice vigente](../docs/01-indice.md), [fuentes de filosofía](../docs/fonts/04-contrato-voz-y-filosofia.md)
+Relacionada con: [índice vigente](../../docs/01-indice.md), [fuentes de filosofía](../../docs/fonts/04-contrato-voz-y-filosofia.md)
 
 ## Alcance histórico conservado
 

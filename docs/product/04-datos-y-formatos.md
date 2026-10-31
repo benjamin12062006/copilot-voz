@@ -28,3 +28,7 @@ Admitir `.md`, `.markdown` y `.txt`, con límite inicial propuesto 1 MiB y UTF-8
 ## Audio
 
 Audio derivado de una revisión del documento y opciones de voz; nunca sustituye al original. Empezar con un artefacto temporal del backend, ID opaco, propietario y caducidad, con entrega autenticada. Limpiar solo audio temporal propio. Persistir audio en Blob y reutilizarlo por hash queda para cuando las mediciones lo justifiquen. La UI mantiene un Object URL revocable para su sesión; no lo confunde con un enlace privado durable.
+
+## Actualización aplicada: biblioteca acotada
+
+Última actualización de esta decisión: 2026-10-31. Por petición del usuario se conservan hasta 20 documentos por propietario. La implementación sustituye el objeto por documento propuesto arriba por un único JSON privado con originales y metadata de la biblioteca, actualizado con ETag. Retirar el más antiguo y guardar el nuevo es atómico. Campos públicos siguen los tipos actuales del frontend (content, markdown/text y revision numérica). Ver [bitácora 06](../../bitacora-construccion/backend/06-biblioteca-blob-y-envio-mcp.md).

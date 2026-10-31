@@ -1,0 +1,7 @@
+interface:
+  display_name: "Voz Redacción (Copilot)"
+  short_description: "Modo de voz persistente por chat hacia Copilot vía MCP"
+  default_prompt: "Usa $voz-redaccion para encender el envío de respuestas de voz a Copilot en este chat hasta que te pida apagarlo."
+
+policy:
+  allow_implicit_invocation: true

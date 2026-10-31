@@ -18,6 +18,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
 class ErrorCode(StrEnum):
+    CONFLICT = "conflict"
+    TOO_LARGE = "too_large"
     INVALID_REQUEST = "invalid_request"
     INVALID_SESSION = "invalid_session"
     FORBIDDEN = "forbidden"
@@ -28,6 +30,8 @@ class ErrorCode(StrEnum):
 
 
 ERROR_STATUS: Final[dict[ErrorCode, int]] = {
+    ErrorCode.CONFLICT: 409,
+    ErrorCode.TOO_LARGE: 413,
     ErrorCode.INVALID_REQUEST: status.HTTP_422_UNPROCESSABLE_CONTENT,
     ErrorCode.INVALID_SESSION: status.HTTP_401_UNAUTHORIZED,
     ErrorCode.FORBIDDEN: status.HTTP_403_FORBIDDEN,
@@ -38,6 +42,8 @@ ERROR_STATUS: Final[dict[ErrorCode, int]] = {
 }
 
 DEFAULT_MESSAGES: Final[dict[ErrorCode, str]] = {
+    ErrorCode.CONFLICT: "El documento cambió. Recarga antes de guardar.",
+    ErrorCode.TOO_LARGE: "El documento supera el tamaño permitido.",
     ErrorCode.INVALID_REQUEST: "La solicitud no es válida.",
     ErrorCode.INVALID_SESSION: "La sesión no es válida o ha caducado.",
     ErrorCode.FORBIDDEN: "No tienes permiso para esta operación.",

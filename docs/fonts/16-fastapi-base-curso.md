@@ -4,7 +4,7 @@ Fecha de creación: 2026-10-30
 Tipo de fuente: transcripciones de curso
 Origen: curso «FastAPI Completo» (título en metadatos: «Pydantic, Bases de datos, SQLAlchemy, SQLModel, JWT, Funciones síncronas y asíncronas, middlewares, alembic y más»). Instructor: no consta en las transcripciones.
 Fecha de consulta: 2026-10-30
-Relacionada con: [plan API 01](../plans/01-api-base-y-configuracion.md), [bitácora 04](../../bitacora-construccion/04-api-base-y-configuracion.md)
+Relacionada con: [plan API 01](../plans/01-api-base-y-configuracion.md), [bitácora 04](../../bitacora-construccion/backend/04-api-base-y-configuracion.md)
 
 ## Necesidad de consulta
 

@@ -3,7 +3,7 @@
 Fecha de creación: 2026-10-30
 Última actualización: 2026-10-30
 Estado: Preparación parcial verificada
-Relacionada con: [API 03](../plans/03-api-documentos-blob-y-markdown.md), [bitácora](../../bitacora-construccion/02-preparacion-upstash.md)
+Relacionada con: [API 03](../plans/03-api-documentos-blob-y-markdown.md), [bitácora](../../bitacora-construccion/backend/02-preparacion-upstash.md)
 
 Tipo de fuente: documentación oficial y herramientas instaladas. Consulta: 2026-10-30.
 

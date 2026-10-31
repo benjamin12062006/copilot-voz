@@ -3,7 +3,7 @@
 Fecha de creación: 2026-10-30
 Estado: Implementado y verificado
 Ámbito: backend FastAPI
-Relacionada con: [plan API 01](../docs/plans/01-api-base-y-configuracion.md), [fuentes FastAPI](../docs/fonts/16-fastapi-base-curso.md), [entrada anterior](03-base-web-y-orden-api-frontend.md)
+Relacionada con: [plan API 01](../../docs/plans/01-api-base-y-configuracion.md), [fuentes FastAPI](../../docs/fonts/16-fastapi-base-curso.md), [entrada anterior](03-base-web-y-orden-api-frontend.md)
 Revisión de partida: `199f42d` (tag `v0.1.0`, punto de control creado antes de este incremento)
 
 ## Necesidad y punto de partida
@@ -30,13 +30,13 @@ Flujo de una petición (de fuera hacia dentro): CORS → `track_request` (asigna
 
 | Decisión | Archivo y símbolo | Adaptación |
 | --- | --- | --- |
-| Configuración tipada con `.env` explícito[^F1] | [settings.py](../backend/app/settings.py) `Settings`, `load_settings` | `env_ignore_empty`; secretos como `SecretStr`; errores de Pydantic convertidos a `ConfigurationError` con `from None` para que el traceback no lleve valores. |
+| Configuración tipada con `.env` explícito[^F1] | [settings.py](../../backend/app/settings.py) `Settings`, `load_settings` | `env_ignore_empty`; secretos como `SecretStr`; errores de Pydantic convertidos a `ConfigurationError` con `from None` para que el traceback no lleve valores. |
 | Exigir configuración por funcionalidad | `Feature`, `FEATURE_REQUIREMENTS`, `Settings.require`/`missing_for` | Mensaje: «Falta configurar usuarios en Turso: TURSO_DATABASE_URL, TURSO_AUTH_TOKEN». |
 | Orígenes exactos[^F4] | `is_exact_origin`, `require_exact_origins` | Aplica a `COPILOT_CORS_ORIGINS` y `CLERK_AUTHORIZED_PARTIES`. |
-| Contrato de errores | [errors.py](../backend/app/errors.py) `ErrorCode`, `ApiError`, `error_response`, `register_error_handlers` | `{"error":{code,message,requestId,details?}}`. Distingue `invalid_request` (422), `invalid_session` (401), `forbidden` (403) y `provider_unavailable` (503). Los detalles de validación dan campo y tipo de fallo, nunca el valor. |
-| Request ID y log[^F3] | [request_context.py](../backend/app/request_context.py) `track_request`, `respond_or_report_failure`, `log_request` | Cabecera `X-Request-ID` expuesta por CORS; log con método, ruta sin query, estado, ms e ID. Un error no controlado responde 500 con el contrato dentro de CORS. |
-| Composición y ciclo de vida[^F2] | [main.py](../backend/app/main.py) `create_app`, `lifespan`, `allow_frontend_origins` | CORS se añade después del seguimiento para quedar por fuera. Métodos `GET, PUT`; cabeceras `Authorization, Content-Type`; sin cookies. `lifespan` solo registra arranque/parada: aún no hay clientes que abrir (llegan en API 02–03). |
-| Salud del proceso | [health.py](../backend/app/health.py) `read_health` | `{"status":"ok"}`, sin consultar proveedores. |
+| Contrato de errores | [errors.py](../../backend/app/errors.py) `ErrorCode`, `ApiError`, `error_response`, `register_error_handlers` | `{"error":{code,message,requestId,details?}}`. Distingue `invalid_request` (422), `invalid_session` (401), `forbidden` (403) y `provider_unavailable` (503). Los detalles de validación dan campo y tipo de fallo, nunca el valor. |
+| Request ID y log[^F3] | [request_context.py](../../backend/app/request_context.py) `track_request`, `respond_or_report_failure`, `log_request` | Cabecera `X-Request-ID` expuesta por CORS; log con método, ruta sin query, estado, ms e ID. Un error no controlado responde 500 con el contrato dentro de CORS. |
+| Composición y ciclo de vida[^F2] | [main.py](../../backend/app/main.py) `create_app`, `lifespan`, `allow_frontend_origins` | CORS se añade después del seguimiento para quedar por fuera. Métodos `GET, PUT`; cabeceras `Authorization, Content-Type`; sin cookies. `lifespan` solo registra arranque/parada: aún no hay clientes que abrir (llegan en API 02–03). |
+| Salud del proceso | [health.py](../../backend/app/health.py) `read_health` | `{"status":"ok"}`, sin consultar proveedores. |
 
 Comando de ejecución, desde `backend/`:
 
@@ -73,7 +73,7 @@ La API arranca con un comando reproducible, valida su configuración y responde 
 
 ## Fuentes
 
-[^F1]: «236. Archivo de configuración y variables de entorno». Curso: FastAPI Completo. Sección 16: SQLModel - Modelos y Schemas - Devinote. Ruta relativa a la biblioteca de transcripciones: `FastAPI/FastAPI Completo/Sección 16 SQLModel - Modelos y Schemas - Devinote/236. Archivo de configuración y variables de entorno.md`. Líneas 13–25. Consulta: 2026-10-30. Ficha: [16](../docs/fonts/16-fastapi-base-curso.md).
+[^F1]: «236. Archivo de configuración y variables de entorno». Curso: FastAPI Completo. Sección 16: SQLModel - Modelos y Schemas - Devinote. Ruta relativa a la biblioteca de transcripciones: `FastAPI/FastAPI Completo/Sección 16 SQLModel - Modelos y Schemas - Devinote/236. Archivo de configuración y variables de entorno.md`. Líneas 13–25. Consulta: 2026-10-30. Ficha: [16](../../docs/fonts/16-fastapi-base-curso.md).
 [^F2]: «271. Configurando main.py». Curso: FastAPI Completo. Sección 17: SQLModel - Servicios y rutas - Devinote. Ruta: `FastAPI/FastAPI Completo/Sección 17 SQLModel - Servicios y rutas - Devinote/271. Configurando main.py.md`. Líneas 17–31. Consulta: 2026-10-30.
 [^F3]: «223. Middleware - Generando Request ID». Curso: FastAPI Completo. Sección 15: Middlewares. Ruta: `FastAPI/FastAPI Completo/Sección 15 Middlewares/223. Middleware - Generando Request ID.md`. Líneas 13–21. Consulta: 2026-10-30.
 [^F4]: «226. Middleware - CORS». Curso: FastAPI Completo. Sección 15: Middlewares. Ruta: `FastAPI/FastAPI Completo/Sección 15 Middlewares/226. Middleware - CORS.md`. Líneas 29–39. Consulta: 2026-10-30.

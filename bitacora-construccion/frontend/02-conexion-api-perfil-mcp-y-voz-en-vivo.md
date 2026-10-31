@@ -1,0 +1,53 @@
+# 02 — Conexión con FastAPI, tokens MCP en Perfil, eliminación y voz en vivo
+
+Fecha de creación: 2026-10-31
+Estado: Implementado; compilación y CORS verificados, listo para interacción con sesión Clerk en navegador
+Ámbito: frontend Nuxt
+Relacionada con: [plan 06](../../docs/plans/06-conectar-api-perfil-y-eliminacion.md), [subplan 05 de voz en vivo](../../docs/plans/frontend/05-voz-en-vivo.md), [bitácora frontend 01](01-pantallas-focus-nuxt-ui-y-clerk.md), [bitácora backend 08](../backend/08-retencion-borrado-y-migracion-turso.md), [fuentes de voz en vivo](../../docs/fonts/frontend/03-voz-en-vivo-navegador.md)
+Revisión de partida: `663e454` más incrementos locales, sin commit.
+
+## Necesidad y punto de partida
+
+Conectar el frontend Nuxt por defecto (`dataSource: 'api'`) con FastAPI (`http://127.0.0.1:8000/api/v1`), añadir en Perfil la gestión de credenciales personales MCP (emitir y copiar una sola vez, listar y revocar) y el límite automático de retención, permitir eliminar documentos desde su vista de detalle con confirmación y mantener la lectura en vivo del navegador sobre bloques Markdown preparados.
+
+Al abrir la aplicación en `http://localhost:3000`, la pantalla `/session` mostraba «Vamos a intentarlo de nuevo / No pudimos conectar con tu cuenta. Inténtalo de nuevo.» porque el navegador bloqueaba por CORS la petición a `http://127.0.0.1:8000/api/v1/users/me` mientras el proceso `uvicorn` seguía corriendo con la configuración anterior (`localhost:3070`).
+
+## Evidencia e interpretación
+
+El cliente HTTP del frontend envía el JWT de sesión de Clerk en `Authorization: Bearer` con `credentials: 'omit'` y reintenta una vez con `skipCache: true` si recibe `401`.[^F1] La lectura en vivo segmenta el Markdown en frases con `Intl.Segmenter('es')` y utiliza síntesis del navegador mediante `easy-speech` sin ejecutar HTML.[^F2]
+
+## Alternativas y decisión
+
+| Enfoque y fuente                                                                                                     | Supuestos y ventajas para esta necesidad                                                                                               | Coste o límite                                                                                             | Decisión y motivo                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Cliente HTTP único (`createApiClient`) compartido por documentos y cuenta, conservando modo `preview` explícito[^F1] | Centraliza cabeceras Bearer, reintento único ante `401` y traducción de códigos HTTP (`404`, `409`, `413`, `422`) a mensajes legibles. | Requiere que `COPILOT_CORS_ORIGINS` en FastAPI incluya el origen exacto de Nuxt (`http://localhost:3000`). | Elegido: evita duplicar lógica de sesión y mantiene `pnpm dev:preview` aislado para pruebas de diseño. |
+| Mostrar el token MCP recién emitido solo en memoria del componente (`AccountStorage.vue`)                            | El token se limpia al desmontar la vista o al ocultarlo manualmente; nunca se guarda en `localStorage`.                                | Si el usuario cierra la página sin copiarlo, debe emitir otro token.                                       | Elegido por seguridad de credenciales personales.                                                      |
+
+## Implementación y funcionamiento
+
+| Decisión respaldada                                                                                       | Archivo y símbolo                                                                                                                                                                                                                                                                 | Adaptación realizada                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cliente HTTP con Bearer Clerk y reintento de sesión                                                       | [api-client.ts](../../frontend/app/services/api-client.ts) (`createApiClient`), [api.client.ts](../../frontend/app/plugins/api.client.ts)                                                                                                                                         | Envía `Authorization: Bearer`, reintenta una vez en `401` y expone `$api` y `$account`.                                                                                                                                                                                                                                 |
+| Servicios reales de documentos y cuenta por defecto                                                       | [nuxt.config.ts](../../frontend/nuxt.config.ts), [documents.ts](../../frontend/app/services/documents.ts) (`createDocumentService`), [account.ts](../../frontend/app/services/account.ts) (`createAccountService`), [voice.client.ts](../../frontend/app/plugins/voice.client.ts) | `dataSource: 'api'` activo por defecto; `useDocumentLibrary` aísla la lista en memoria por `user.id`.                                                                                                                                                                                                                   |
+| Bloques «Acceso para agentes MCP» y «Almacenamiento» en Perfil + botón de copia de skill `/voz-redaccion` | [account.vue](../../frontend/app/pages/account.vue), [AccountStorage.vue](../../frontend/app/components/AccountStorage.vue), [mcp-skill-prompt.ts](../../frontend/app/utils/mcp-skill-prompt.ts), [SKILL.md](../../.agents/skills/voz-redaccion/SKILL.md)                         | Emisión, copia al portapapeles, botón en la esquina para copiar en un clic el contexto de conexión MCP y la especificación de la skill `/voz-redaccion` (con regla de confirmación previa obligatoria e inserción automática del token si acaba de emitirse), revocación con confirmación y ajuste del límite `1..100`. |
+| Eliminación manual desde el detalle del documento                                                         | [voice/[id].vue](../../frontend/app/pages/voice/[id].vue) (`deleteDocument`)                                                                                                                                                                                                      | Detiene la voz activa, pide confirmación, llama a `DELETE /documents/{id}?revision=…`, refresca la biblioteca y vuelve a `/voice`.                                                                                                                                                                                      |
+| Lectura en vivo por frases y bloques                                                                      | [prepare-reading.ts](../../frontend/app/services/reading/prepare-reading.ts), [live-voice.ts](../../frontend/app/services/live-voice.ts), [LiveVoiceBar.vue](../../frontend/app/components/LiveVoiceBar.vue)                                                                      | Resaltado de bloque y palabra actual, salto por bloque y controles de voz del sistema.                                                                                                                                                                                                                                  |
+
+## Comprobación
+
+| Comando, petición o prueba ejecutada                                                                      | Resultado observado                                                                                            |
+| --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `pnpm typecheck && pnpm lint && pnpm format:check`                                                        | Sin errores de tipos, ESLint ni formato Prettier.                                                              |
+| `pnpm build`                                                                                              | Compilación cliente y servidor Nitro completada sin errores.                                                   |
+| Reinicio de `uvicorn` y preflight CORS desde `http://localhost:3000`                                      | `HTTP/1.1 200 OK` con `access-control-allow-origin: http://localhost:3000`.                                    |
+| Envío real con `voice_submit_document` usando el token generado en Perfil y las reglas de `voz-redaccion` | `{"documentId": "81761833-f3bd-54dc-9415-a3731a7296a1", "revision": 1}` guardado en la biblioteca del usuario. |
+
+## Consecuencias y continuidad
+
+Con el servidor `uvicorn` reiniciado cargando `COPILOT_CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]`, el botón «Reintentar» en `/session` ya puede completar `GET/PUT /api/v1/users/me` sin bloqueo CORS. Queda lista la validación interactiva del usuario en su navegador.
+
+## Fuentes
+
+[^F1]: [Clerk en Nuxt y verificación en Python](../../docs/fonts/10-clerk-nuxt-y-python.md). Consulta: 2026-10-31.
+
+[^F2]: [Voz en vivo en el navegador](../../docs/fonts/frontend/03-voz-en-vivo-navegador.md). Consulta: 2026-10-31.
