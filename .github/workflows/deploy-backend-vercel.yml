@@ -49,9 +49,9 @@ jobs:
       - name: Compilar FastAPI
         run: vercel build --prod
       - name: Desplegar los artefactos compilados
-        run: vercel deploy --prebuilt --prod > deployment-url.txt
+        run: vercel deploy --prebuilt --prod --json > deployment.json
       - name: Verificar salud de producción
         run: |
-          deployment_url=$(tail -n 1 deployment-url.txt)
+          deployment_url=$(python -c "import json; d=json.load(open('deployment.json')); d=d.get('deployment',d); u=d.get('productionUrl') or d['url']; print(u if u.startswith('https://') else 'https://'+u)")
           vercel curl /health --deployment "$deployment_url" -- --fail --retry 5 --retry-all-errors
           echo "Backend: $deployment_url" >> "$GITHUB_STEP_SUMMARY"
