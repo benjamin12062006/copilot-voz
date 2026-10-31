@@ -1,0 +1,53 @@
+@import '@fontsource/roboto/latin-400.css';
+@import '@fontsource/roboto/latin-600.css';
+@import '@fontsource/roboto/latin-700.css';
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #163c32;
+  --color-canvas: #f6f4ed;
+  --color-muted: #63736b;
+  --color-line: #e3e7df;
+  --color-sage: #eaf0e9;
+  --color-terracotta: #dd865b;
+  --font-sans: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply m-0 bg-canvas font-sans text-ink antialiased;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:enabled {
+    @apply cursor-pointer;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-ink;
+  }
+
+  ::selection {
+    @apply bg-ink text-white;
+  }
+}
+
+@utility action-primary {
+  @apply flex min-h-13 w-full items-center justify-center gap-3 rounded-2xl bg-ink px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-ink/90 disabled:cursor-wait disabled:opacity-60;
+}
+
+@utility action-secondary {
+  @apply flex min-h-12 w-full items-center justify-center gap-3 rounded-2xl border border-muted/70 px-5 py-3 text-base transition-colors hover:bg-sage disabled:cursor-wait disabled:opacity-60;
+}
+
+@utility action-text {
+  @apply inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-base transition-colors hover:bg-sage;
+}
+
+@utility eyebrow {
+  @apply text-[11px] leading-5 font-semibold tracking-[0.16em] text-muted uppercase;
+}

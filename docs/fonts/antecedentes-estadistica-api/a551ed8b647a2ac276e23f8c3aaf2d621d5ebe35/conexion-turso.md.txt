@@ -1,0 +1,69 @@
+# 01 — Turso preparado como integración independiente
+
+Fecha de creación: 2026-10-22
+Estado: Disponible para integración futura; sin consumidores en la API
+Relacionada con: [plan](../plans/05-preparar-turso-independiente.md), [bitácora](../../bitacora-construccion/settings/08-preparar-turso-independiente.md), [PostgreSQL activo](../../bitacora-construccion/settings/07-aplicar-migraciones-y-verificar-cloud-sql.md).
+
+## Estado actual
+
+Usuarios, sincronización y espacios continúan en PostgreSQL. Turso tiene su código y herramientas preparados, pero `AppModule`, `PrismaModule`, `UsersModule` y `StatisticalSpacesModule` no lo importan ni lo usan. Completar sus variables no cambia el destino del producto.
+
+| Pieza | PostgreSQL activo | Turso preparado |
+| --- | --- | --- |
+| Configuración Prisma | `prisma.config.ts` | `prisma.turso.config.ts` |
+| Schema | `prisma/schema.prisma` | `prisma/turso/schema.prisma` |
+| Cliente generado | `src/generated/prisma` | `src/generated/prisma-turso` |
+| Migraciones | `prisma/migrations` | `prisma/migrations-turso` |
+| Conexión Nest | `PrismaService`, conector Cloud SQL y `pg` | `TursoService`, conexión diferida con `PrismaLibSql` |
+| Aplicación manual | `pnpm db:migrate` | `pnpm db:turso:migrate` |
+
+## Conexión TypeScript
+
+[resolveTursoConnection](../../src/database/turso/turso.connection.ts) lee exclusivamente `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN`. Nunca utiliza la URL de migraciones PostgreSQL ni la variable genérica `DATABASE_URL`.
+
+[TursoService](../../src/database/turso/turso.service.ts) no implementa `onModuleInit`: construirlo no valida variables ni abre una conexión. Solo `connect()` resuelve configuración, crea el cliente Prisma libSQL y verifica `SELECT 1`. Las llamadas simultáneas comparten una apertura; una apertura fallida libera recursos y permite reintentar. `onModuleDestroy()` cierra una conexión que se haya abierto explícitamente.
+
+[TursoModule](../../src/database/turso/turso.module.ts) exporta el servicio para una feature futura. Para usarlo en el futuro habrá que importar ese módulo en la feature correspondiente, inyectar `TursoService` y llamar explícitamente `await turso.connect()`. No se hizo ese enlace en ningún consumidor actual. Los repositorios PostgreSQL no se deben reutilizar sin adaptación sobre el cliente SQLite: sus namespaces y algunas sentencias son distintos.
+
+## Variables reservadas
+
+En `.env` y `.env.example` quedan:
+
+```dotenv
+TURSO_DATABASE_URL=
+TURSO_AUTH_TOKEN=
+```
+
+Cuando se vaya a utilizar la integración, completar la URL `libsql://...` y su token real. Se restauraron los nombres, pero no se inventaron valores: el `.env` anterior estaba ignorado por Git y sus secretos retirados no se recuperan del historial versionado. Se conserva cualquier valor que el usuario ya haya repuesto.
+
+El servicio admite `file:` y `:memory:` para comprobaciones locales aisladas. Eso no cambia la configuración PostgreSQL de la API. Las credenciales Turso permanecen únicamente en el servidor y no deben copiarse a Flutter o Nuxt.
+
+## Generación y migraciones
+
+`pnpm prisma:generate` genera ambos clientes; generar código no consulta bases de datos. También se pueden generar por separado:
+
+```sh
+pnpm prisma:generate:postgres
+pnpm prisma:generate:turso
+```
+
+El [migrador Turso](../../scripts/db/migration-turso.mjs) se recuperó del archivo `scripts/db/migrate-prisma-to-turso.mjs` del commit `01a16a4`, cambiando su destino a `prisma/migrations-turso`. Conserva checksums, transacciones de escritura, registro `prisma_remote_migrations` y compatibilidad con las versiones del migrador SQL anterior.
+
+Comandos manuales para cuando se quiera operar sobre Turso y ya existan credenciales válidas:
+
+```sh
+pnpm db:turso:status
+pnpm db:turso:migrate
+```
+
+`status` solo consulta el estado. `migrate` aplica pendientes y modifica el esquema del destino Turso seleccionado. El script exige `--status` o `--apply`; los comandos anteriores incluyen esos argumentos. Ninguno se ejecuta en `start`, `build`, `prebuild` o al importar el módulo. No se ejecutaron contra Turso remoto en este incremento.
+
+La configuración `prisma.turso.config.ts` se usa para generar/validar el cliente. Las migraciones remotas libSQL las aplica el script independiente, no `prisma migrate deploy` de PostgreSQL. Los tres SQL históricos recuperados son la base compatible con el antiguo esquema; no convierten Turso en el almacén actual de usuarios. Los futuros cambios de esa integración se agregarán únicamente en `prisma/migrations-turso`.
+
+## Verificación local
+
+```sh
+pnpm db:turso:verify
+```
+
+Las pruebas verifican apertura explícita, ausencia de acceso a configuración al construir/cerrar el servicio, variables independientes y migraciones repetibles/baseline sobre libSQL en memoria. La prueba SQLite local usa el cliente Prisma Turso generado, no el cliente PostgreSQL. No demuestra credenciales remotas ni asigna una función de negocio futura a esa base.

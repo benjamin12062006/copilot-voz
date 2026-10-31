@@ -1,0 +1,8 @@
+# Plantilla inactiva: app.mcp.stdio aún no está implementado.
+# Fusionar con .codex/config.toml al cerrar API 04; no sustituir otras entradas.
+[mcp_servers.copilot-voz]
+command = "/Users/benji/.local/bin/uv"
+args = ["--directory", "/Users/benji/Documents/Copilot/backend", "run", "--locked", "python", "-m", "app.mcp.stdio"]
+
+[mcp_servers.copilot-voz.env]
+COPILOT_MCP_ENV_FILE = "/Users/benji/Documents/Copilot/backend/mcp-clients/.env"

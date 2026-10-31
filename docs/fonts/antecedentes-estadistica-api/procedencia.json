@@ -1,0 +1,30 @@
+[
+  {
+    "ref": "v0.2.0",
+    "commit": "f7fc66a180982ddedec831503600029ef21c71ec",
+    "source": "docs/fonts/courses-searching.md",
+    "copy": "antecedentes-estadistica-api/v0.2.0/inventario-cursos.md.txt",
+    "sha256": "95bba63bbec7f6191a60b2164b334605979456faab53eb00668110bbcd82de8d"
+  },
+  {
+    "ref": "v0.2.0",
+    "commit": "f7fc66a180982ddedec831503600029ef21c71ec",
+    "source": "docs/fonts/sqlite-docker-compose-y-datagrip.md",
+    "copy": "antecedentes-estadistica-api/v0.2.0/sqlite-docker-datagrip.md.txt",
+    "sha256": "a6b527f51e7ea39a13abb67f33243bfb3fb7bf39536b522050d508e0ef67ddd0"
+  },
+  {
+    "ref": "v0.3.0",
+    "commit": "17009ea3ad51a02208da837afae7b03e6b2b8935",
+    "source": "prisma/migrations/20260924000100_create_app_users/migration.sql",
+    "copy": "antecedentes-estadistica-api/v0.3.0/usuarios.sql",
+    "sha256": "a9318a52c782c2b748dfeafe973b63f90ef274875d266b16516287512bc2cf0c"
+  },
+  {
+    "ref": "a551ed8b647a2ac276e23f8c3aaf2d621d5ebe35",
+    "commit": "a551ed8b647a2ac276e23f8c3aaf2d621d5ebe35",
+    "source": "docs/turso/01-conexion-y-migraciones-preparadas.md",
+    "copy": "antecedentes-estadistica-api/a551ed8b647a2ac276e23f8c3aaf2d621d5ebe35/conexion-turso.md.txt",
+    "sha256": "13641bfa5f74cef62589016a4a2e89665689b01f2d11cedf1f2caa60ac617b39"
+  }
+]

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Construir con evidencia"
+  short_description: "Implementaciones y documentación histórica trazable"
+  default_prompt: "Usa $construir-con-evidencia para implementar este cambio y conservar fuentes, planes, decisiones, fechas y verificaciones relacionadas en el archivo documental del proyecto."

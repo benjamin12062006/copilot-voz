@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "copilot-voz": {
+      "type": "stdio",
+      "command": "/Users/benji/.local/bin/uv",
+      "args": [
+        "--directory",
+        "/Users/benji/Documents/Copilot/backend",
+        "run",
+        "--locked",
+        "python",
+        "-m",
+        "app.mcp.stdio"
+      ],
+      "env": {
+        "COPILOT_MCP_ENV_FILE": "/Users/benji/Documents/Copilot/backend/mcp-clients/.env"
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+# Upstash se instala en Codex y se activa únicamente para este proyecto.
+[plugins."upstash@upstash"]
+enabled = true
+
+[plugins."turso@turso"]
+enabled = true
