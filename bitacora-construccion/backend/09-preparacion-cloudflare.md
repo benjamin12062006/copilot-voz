@@ -30,4 +30,6 @@ Tipos del Worker backend, compilación del frontend con Clerk sintético y empaq
 
 Pendiente de comprobar la imagen Docker en el runner Linux de GitHub. Docker local no estaba iniciado y no se obtuvo acceso de Computer Use a OrbStack.
 
+La primera ejecución de CI detectó que `DocumentStore.list` ocultaba el builtin `list` al evaluar una anotación posterior en Python 3.12. Se añadió `from __future__ import annotations` a `app/documents.py` para aplazar esa evaluación, sin cambiar métodos ni contratos. La comprobación Linux se repite antes de cerrar el incremento.
+
 La suscripción, conexión del repositorio, secretos de Cloudflare y despliegue real quedan fuera de esta preparación. El Worker frontend previamente creado seguía teniendo únicamente Hello World al comenzar este incremento.

@@ -1,5 +1,7 @@
 """Biblioteca privada y acotada: guardar y retener se confirman juntos."""
 
+from __future__ import annotations
+
 import asyncio
 import hashlib
 import re
