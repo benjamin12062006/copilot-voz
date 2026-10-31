@@ -1,7 +1,8 @@
 # 04 — Lectura automática de documentos nuevos (prueba en localhost)
 
 Fecha de creación: 2026-10-31
-Estado: Implementado, pendiente de verificación
+Última actualización: 2026-10-31
+Estado: Implementado y verificado
 Ámbito: frontend Nuxt
 Relacionada con: [plan 07](../../docs/plans/frontend/07-lectura-automatica.md), [voz en vivo](02-conexion-api-perfil-mcp-y-voz-en-vivo.md), [despliegue](03-despliegue-vercel-y-cors.md)
 Revisión de partida: `52a1059` (tag `v0.4.0`, solo local)
@@ -32,4 +33,4 @@ Decisión pospuesta: guardar el modo en Turso (migración 004 y endpoint), hasta
 - Prettier, sobre los archivos cambiados, correcto. El `format:check` global falla solo por `.vercel/output`, generado por el despliegue y ajeno a este cambio.
 - En el navegador integrado, `localhost:3000` carga sin errores de consola hasta el acceso de Clerk. No se inició sesión por el usuario.
 
-**Pendiente (usuario):** activar el modo en Perfil, cambiar de pestaña, enviar un `.md` por el MCP y comprobar que se lee completo con la pestaña oculta, en Chrome y si se quiere en Safari.
+**Verificación del usuario:** activó el modo en Perfil, cambió de pestaña, envió un `.md` por el MCP y confirmó que se leyó solo. La opción pasó después a Turso: ver [backend 11](../backend/11-preferencias-de-voz-en-turso.md).

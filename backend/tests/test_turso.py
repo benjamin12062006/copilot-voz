@@ -38,7 +38,7 @@ class TursoAcceptance(unittest.TestCase):
         self.assertFalse(apply_migrations(self.connect))
         check_migrations(self.connect)
         with closing(self.connect()) as connection:
-            self.assertEqual(connection.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0], 3)
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0], 4)
 
     def test_read_absent_and_provision_null_profile(self):
         apply_migrations(self.connect)

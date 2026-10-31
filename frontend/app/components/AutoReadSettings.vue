@@ -2,6 +2,7 @@
 import type { AutoReadMode } from '../types/voice';
 
 const { mode, setMode } = useAutoReadMode();
+const toast = useToast();
 
 const MODE_ITEMS: {
   label: string;
@@ -27,8 +28,19 @@ const MODE_ITEMS: {
 
 const selectedMode = computed({
   get: () => mode.value,
-  set: (value: AutoReadMode) => setMode(value),
+  set: (value: AutoReadMode) => void changeMode(value),
 });
+
+async function changeMode(value: AutoReadMode) {
+  try {
+    await setMode(value);
+  } catch {
+    toast.add({
+      title: 'No pudimos guardar la opción. Inténtalo de nuevo.',
+      color: 'error',
+    });
+  }
+}
 </script>
 
 <template>
@@ -47,7 +59,8 @@ const selectedMode = computed({
     </div>
     <URadioGroup v-model="selectedMode" :items="MODE_ITEMS" />
     <p class="text-xs text-dimmed">
-      Por ahora se guarda solo en este navegador.
+      Se guarda en tu cuenta: si abres Copilot en otro equipo, también leerá
+      allí.
     </p>
   </section>
 </template>

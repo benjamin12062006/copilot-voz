@@ -1,3 +1,4 @@
+import type { AutoReadMode } from '../types/voice';
 import type { ApiClient } from './api-client';
 
 export interface AgentToken {
@@ -13,6 +14,9 @@ export interface IssuedToken extends Omit<AgentToken, 'revokedAt'> {
 }
 export interface StoragePreference {
   retentionLimit: number;
+}
+export interface VoicePreference {
+  autoReadMode: AutoReadMode;
 }
 
 export function createAccountService(api: ApiClient) {
@@ -32,6 +36,14 @@ export function createAccountService(api: ApiClient) {
     setRetention(retentionLimit: number) {
       return api.request<StoragePreference>('/storage/preferences', 'PUT', {
         retentionLimit,
+      });
+    },
+    voicePreferences() {
+      return api.request<VoicePreference>('/voice/preferences');
+    },
+    setAutoReadMode(autoReadMode: AutoReadMode) {
+      return api.request<VoicePreference>('/voice/preferences', 'PUT', {
+        autoReadMode,
       });
     },
   };

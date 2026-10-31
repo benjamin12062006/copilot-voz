@@ -36,7 +36,8 @@ CREATE_MIGRATIONS: Final = """
 
 
 MIGRATION_FILES: Final = [MIGRATION_FILE, MIGRATION_FILE.with_name('002_mcp_tokens.sql'),
-                         MIGRATION_FILE.with_name('003_storage_preferences.sql')]
+                         MIGRATION_FILE.with_name('003_storage_preferences.sql'),
+                         MIGRATION_FILE.with_name('004_voice_preferences.sql')]
 
 
 class MigrationError(RuntimeError):
@@ -57,6 +58,8 @@ def apply_migrations(connect: ConnectionFactory) -> bool:
                 raise MigrationError('app_mcp_tokens existe sin migración registrada.')
             if 'app_storage_preferences' in tables and 3 not in applied:
                 raise MigrationError('app_storage_preferences existe sin migración registrada.')
+            if 'app_voice_preferences' in tables and 4 not in applied:
+                raise MigrationError('app_voice_preferences existe sin migración registrada.')
             for version, path in enumerate(MIGRATION_FILES, 1):
                 if version in applied:
                     continue
@@ -66,12 +69,15 @@ def apply_migrations(connect: ConnectionFactory) -> bool:
                     verify_tokens_schema(connection)
                 if version >= 3:
                     verify_preferences_schema(connection)
+                if version >= 4:
+                    verify_voice_preferences_schema(connection)
                 connection.execute(
                     'INSERT INTO schema_migrations (version, name, checksum, applied_at) VALUES (?, ?, ?, ?)',
                     (version, path.stem, hashlib.sha256(path.read_bytes()).hexdigest(), datetime.now(UTC).isoformat()))
             verify_users_schema(connection)
             verify_tokens_schema(connection)
             verify_preferences_schema(connection)
+            verify_voice_preferences_schema(connection)
             connection.commit()
             return len(applied) < len(MIGRATION_FILES)
         except Exception:
@@ -88,6 +94,7 @@ def check_migrations(connect: ConnectionFactory) -> None:
         verify_users_schema(connection)
         verify_tokens_schema(connection)
         verify_preferences_schema(connection)
+        verify_voice_preferences_schema(connection)
 
 
 def verified_history(connection: Connection) -> set[int]:
@@ -117,6 +124,13 @@ def verify_preferences_schema(connection: Connection) -> None:
         raise MigrationError('El esquema de preferencias no coincide con la migración 003.')
 
 
+def verify_voice_preferences_schema(connection: Connection) -> None:
+    rows = connection.execute('PRAGMA table_info(app_voice_preferences)').fetchall()
+    columns = [(row[1], row[2].upper(), row[3], row[5]) for row in rows]
+    if columns != [('user_id', 'TEXT', 1, 1), ('auto_read_mode', 'TEXT', 1, 0)]:
+        raise MigrationError('El esquema de preferencias de voz no coincide con la migración 004.')
+
+
 def user_tables(connection: Connection) -> set[str]:
     rows = connection.execute(
         "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT GLOB 'sqlite_*'"
@@ -125,7 +139,8 @@ def user_tables(connection: Connection) -> set[str]:
 
 
 def require_copilot_tables(tables: set[str]) -> None:
-    if tables - {"app_users", "schema_migrations", "app_mcp_tokens", "app_storage_preferences"}:
+    if tables - {"app_users", "schema_migrations", "app_mcp_tokens", "app_storage_preferences",
+                 "app_voice_preferences"}:
         raise MigrationError("La base contiene tablas ajenas; usar una base exclusiva de Copilot.")
 
 

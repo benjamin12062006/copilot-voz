@@ -22,6 +22,7 @@ from app.database import SqlUserRepository, TursoDatabase
 from app.document_routes import router as documents_router
 from app.documents import DocumentStore
 from app.storage_preferences import StoragePreferences
+from app.voice_preferences import VoicePreferences, router as voice_router
 from app.errors import register_error_handlers
 from app.health import router as health_router
 from app.request_context import REQUEST_ID_HEADER, track_request
@@ -48,6 +49,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.users = None
     app.state.agent_tokens = None
     app.state.documents = None
+    app.state.voice_preferences = None
 
     register_error_handlers(app)
     add_request_tracking(app)
@@ -56,6 +58,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(users_router, prefix=API_V1_PREFIX)
     app.include_router(tokens_router, prefix=API_V1_PREFIX)
     app.include_router(documents_router, prefix=API_V1_PREFIX)
+    app.include_router(voice_router, prefix=API_V1_PREFIX)
     return app
 
 
@@ -68,6 +71,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         preferences = StoragePreferences(database.connect)
         app.state.users = SqlUserRepository(database.connect)
         app.state.agent_tokens = AgentTokenRepository(database.connect)
+        app.state.voice_preferences = VoicePreferences(database.connect)
     # Cada operación SQL abre y cierra su conexión; no se ejecuta DDL al arrancar.
     async with AsyncExitStack() as clients:
         if settings.upstash_blob_token:
@@ -81,6 +85,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             app.state.users = None
             app.state.agent_tokens = None
             app.state.documents = None
+            app.state.voice_preferences = None
             logger.info("API detenida")
 
 

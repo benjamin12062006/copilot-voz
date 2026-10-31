@@ -3,14 +3,12 @@
  * en voz alta sin abrirlo, también con la pestaña en segundo plano.
  *
  * Solo funciona mientras la pestaña siga abierta: la voz es la del navegador.
- * Prueba en localhost: la opción se guarda en este navegador, todavía no en Turso.
+ * La opción es de la cuenta y se guarda en Turso a través de la API.
  */
 import { prepareReading } from '../services/reading/prepare-reading';
+import type { AccessState } from '../types/access';
 import type { DocumentSummary } from '../types/documents';
 import type { AutoReadMode } from '../types/voice';
-
-const MODE_KEY = 'copilot.voice.auto-read.v1';
-const AUTO_READ_MODES: readonly AutoReadMode[] = ['off', 'agent', 'all'];
 
 /** Cada cuánto se pregunta a la API si hay documentos nuevos. */
 const POLL_INTERVAL_MS = 20_000;
@@ -24,13 +22,30 @@ const FREE_VOICE_STATUSES = ['idle', 'ended', 'error', 'unsupported'];
 /** La opción elegida en Perfil, compartida con el lector. */
 export function useAutoReadMode() {
   const mode = modeState();
+  const { $account } = useNuxtApp();
 
-  function setMode(next: AutoReadMode) {
-    mode.value = next;
-    saveMode(next);
+  /** Lee la opción de la cuenta. Si no se puede, queda apagada: nunca habla por sorpresa. */
+  async function load() {
+    try {
+      mode.value = (await $account.voicePreferences()).autoReadMode;
+    } catch {
+      mode.value = 'off';
+    }
   }
 
-  return { mode: readonly(mode), setMode };
+  /** Cambia la opción al momento y la guarda; si falla, vuelve a la anterior. */
+  async function setMode(next: AutoReadMode) {
+    const previous = mode.value;
+    mode.value = next;
+    try {
+      await $account.setAutoReadMode(next);
+    } catch (error) {
+      mode.value = previous;
+      throw error;
+    }
+  }
+
+  return { mode: readonly(mode), load, setMode };
 }
 
 /**
@@ -39,6 +54,8 @@ export function useAutoReadMode() {
  */
 export function useAutoReader() {
   const mode = modeState();
+  const { load: loadMode } = useAutoReadMode();
+  const access = useState<AccessState>('access');
   const library = useDocumentLibrary();
   const { $documents, $voice } = useNuxtApp();
   const toast = useToast();
@@ -53,14 +70,17 @@ export function useAutoReader() {
   let hasAskedForClick = false;
 
   const isEnabled = computed(() => mode.value !== 'off');
+  const userId = computed(() =>
+    access.value.status === 'ready' ? access.value.user.id : null,
+  );
 
   watch(isEnabled, (enabled) => (enabled ? start() : stop()));
   watch(library.documents, enqueueNewDocuments);
   watch(() => $voice.state.value.status, readNextWhenFree);
 
   onMounted(() => {
-    // La opción vive en este navegador: el servidor no la conoce.
-    mode.value = loadMode();
+    // Solo en el navegador (la API se llama desde aquí): al entrar y al cambiar de cuenta.
+    watch(userId, loadModeFor, { immediate: true });
     // Tras recargar, el navegador no deja hablar hasta el primer clic.
     window.addEventListener('pointerdown', readNextWhenFree);
   });
@@ -69,6 +89,11 @@ export function useAutoReader() {
     stop();
     window.removeEventListener('pointerdown', readNextWhenFree);
   });
+
+  function loadModeFor(id: string | null) {
+    if (id) void loadMode();
+    else mode.value = 'off';
+  }
 
   function start() {
     knownIds = null;
@@ -201,25 +226,4 @@ function hasUserActivation() {
 
 function byOldestFirst(a: DocumentSummary, b: DocumentSummary) {
   return a.updatedAt.localeCompare(b.updatedAt);
-}
-
-function loadMode(): AutoReadMode {
-  try {
-    const saved = localStorage.getItem(MODE_KEY);
-    return isAutoReadMode(saved) ? saved : 'off';
-  } catch {
-    return 'off';
-  }
-}
-
-function saveMode(mode: AutoReadMode) {
-  try {
-    localStorage.setItem(MODE_KEY, mode);
-  } catch {
-    // Sin almacenamiento la opción dura hasta recargar.
-  }
-}
-
-function isAutoReadMode(value: unknown): value is AutoReadMode {
-  return AUTO_READ_MODES.some((mode) => mode === value);
 }
