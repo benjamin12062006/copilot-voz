@@ -8,7 +8,7 @@
   "vars": {
     "COPILOT_ENV": "production",
     "COPILOT_CORS_ORIGINS": "[\"https://copilot-frontend.benjamin12062006.workers.dev\"]",
-    "COPILOT_STORAGE_NAMESPACE": "copilot/prod",
+    "COPILOT_STORAGE_NAMESPACE": "copilot/dev",
     "COPILOT_STORAGE_MAX_DOCUMENT_BYTES": "1048576",
     "CLERK_AUTHORIZED_PARTIES": "[\"https://copilot-frontend.benjamin12062006.workers.dev\"]"
   },

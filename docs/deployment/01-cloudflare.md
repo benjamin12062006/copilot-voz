@@ -83,13 +83,13 @@ Ya están declarados en `backend/wrangler.jsonc`:
 COPILOT_ENV=production
 COPILOT_CORS_ORIGINS=["https://copilot-frontend.benjamin12062006.workers.dev"]
 CLERK_AUTHORIZED_PARTIES=["https://copilot-frontend.benjamin12062006.workers.dev"]
-COPILOT_STORAGE_NAMESPACE=copilot/prod
+COPILOT_STORAGE_NAMESPACE=copilot/dev
 COPILOT_STORAGE_MAX_DOCUMENT_BYTES=1048576
 ```
 
-`copilot/prod` es un espacio nuevo: los documentos guardados antes bajo `copilot/dev` no aparecen automáticamente en él. El token Blob conserva el acceso que tenga en el proveedor; el prefijo no sustituye permisos del bucket.
+Se conserva `copilot/dev`, el espacio que ya utiliza el proyecto, para mantener el acceso a sus documentos existentes. El despliegue no crea una base SQLite local ni configura almacenamiento en Cloudflare. Turso y Upstash Blob siguen siendo los proveedores existentes.
 
-Al cambiar secretos, volver a desplegar/reiniciar el contenedor para que el nuevo proceso reciba los valores. No añadir `COPILOT_STORAGE_API_TOKEN`: es una variable antigua que el backend actual no consume. Los tokens MCP son personales y se generan en la aplicación.
+Al cambiar secretos, reiniciar el contenedor para que el nuevo proceso reciba los valores; también puede dejarse que se suspenda tras dos minutos sin tráfico y comprobar el siguiente arranque. No añadir `COPILOT_STORAGE_API_TOKEN`: es una variable antigua que el backend actual no consume. Los tokens MCP son personales y se generan en la aplicación.
 
 Plantilla para desarrollo con Wrangler: [`backend/.dev.vars.example`](../../backend/.dev.vars.example). Copiar a `.dev.vars` únicamente en el equipo local; el archivo real se ignora en Git y Docker.
 
@@ -99,15 +99,14 @@ Las credenciales locales actuales de Clerk son de desarrollo. Para publicar en p
 
 Las claves publicable y secreta y `CLERK_ISSUER` deben pertenecer a la misma instancia. Cambiar de instancia cambia la identidad de los usuarios; los perfiles existentes no se migran por copiar variables.
 
-Para una base Turso nueva, configurar sus credenciales localmente y aplicar las migraciones explícitamente desde `backend/`:
+El despliegue usa la base Turso existente. No crea otra base ni aplica migraciones. Para comprobar el esquema actual desde `backend/`, sin modificarlo:
 
 ```sh
-uv run --locked python -m app.migrations --apply
 uv run --locked python -m app.migrations
 uv run --locked python -m app.database
 ```
 
-El comando de migraciones valida el esquema y modifica la base configurada. No ejecutarlo contra una base ajena al proyecto. Si se reutiliza una base ya migrada, comprobar su estado; no borrar ni recrear tablas. El servidor no ejecuta DDL al arrancar.
+Sin `--apply`, el comando de migraciones solo valida el esquema. El servidor no ejecuta DDL al arrancar. Cualquier migración futura debe tratarse aparte del despliegue.
 
 ## CLI opcional y verificación posterior
 
