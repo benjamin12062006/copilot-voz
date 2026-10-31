@@ -2,7 +2,7 @@
 
 Fecha de creación: 2026-10-30
 Última actualización: 2026-10-30
-Estado: Entorno preparado; implementación pendiente
+Estado: Entorno preparado; API 01 implementada
 Relacionada con: [orden de trabajo](../docs/01-indice.md), [clientes MCP](../docs/fonts/15-conexion-mcp-codex-y-claude.md)
 
 ## Preparado
@@ -11,7 +11,7 @@ Relacionada con: [orden de trabajo](../docs/01-indice.md), [clientes MCP](../doc
 
 ## Pendiente de implementar
 
-No existe módulo ASGI ejecutable, rutas de API, conexión Turso, verificación Clerk, parser Markdown, motor de voz ni servidor MCP propio. Ejecutar los planes [01](../docs/plans/01-api-base-y-configuracion.md) a [04](../docs/plans/04-api-voz-y-mcp.md) antes de desarrollar el panel Nuxt.
+API 01 añadió `app/` con configuración, contrato de errores, request ID, CORS y `GET /health` ([bitácora 04](../bitacora-construccion/04-api-base-y-configuracion.md)). Aún no existen rutas de producto, conexión Turso, verificación Clerk, parser Markdown, motor de voz ni servidor MCP propio. Ejecutar los planes [01](../docs/plans/01-api-base-y-configuracion.md) a [04](../docs/plans/04-api-voz-y-mcp.md) antes de desarrollar el panel Nuxt.
 
 ## Configuración
 
@@ -21,6 +21,6 @@ Para API 02: aplicación Clerk, issuer, authorized parties, IDs personales permi
 
 ## Comandos válidos hoy
 
-Desde `backend/`: `uv sync --locked` y `uv run --locked python -c "import fastapi, pydantic_settings, upstash_blob"`. El comando uvicorn y el módulo stdio de las plantillas MCP serán válidos cuando se implementen sus módulos.
+Desde `backend/`: `uv sync --locked` y `uv run --locked python -c "import fastapi, pydantic_settings, upstash_blob"`. Arrancar la API: `uv run --locked uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log`. El módulo stdio de las plantillas MCP será válido cuando se implemente.
 
 [MCP clientes](mcp-clients/codex.toml.example) contiene solo una plantilla. No se activa contra un módulo ausente. Las comprobaciones de conexión remota requieren configuración real; no se han creado ni modificado recursos remotos.

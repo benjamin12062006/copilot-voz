@@ -2,8 +2,8 @@
 
 Fecha de creación: 2026-10-30
 Última actualización: 2026-10-30
-Estado: Plan
-Relacionada con: [arquitectura](../product/03-arquitectura-y-legibilidad.md), [entorno preparado](../../backend/01-preparacion.md)
+Estado: Implementado y verificado — ver [bitácora 04](../../bitacora-construccion/04-api-base-y-configuracion.md)
+Relacionada con: [arquitectura](../product/03-arquitectura-y-legibilidad.md), [entorno preparado](../../backend/01-preparacion.md), [fuentes FastAPI](../fonts/16-fastapi-base-curso.md)
 
 ## Objetivo y punto de partida
 

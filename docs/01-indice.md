@@ -22,7 +22,7 @@ Ejecutar cada plan en este orden. Las comprobaciones de aceptación son trabajo 
 ## Estado real
 
 - `frontend/`: copia de estadistica-forms-web, renombrada copilot-web y adaptada de Descope a Clerk. Conserva organización y pantallas de acceso/cuenta. El panel Voz con estilo Focus todavía no existe.
-- `backend/`: entorno uv y dependencias FastAPI, uvicorn, pydantic-settings y upstash-blob. Todavía no hay aplicación ASGI, rutas, conexión Turso, verificación JWT, parser ni motor de voz.
+- `backend/`: entorno uv y API 01 implementada: configuración validada, contrato de errores, request ID, CORS y `GET /health` ([bitácora 04](../bitacora-construccion/04-api-base-y-configuracion.md)). Todavía no hay rutas de producto, conexión Turso, verificación JWT, parser ni motor de voz.
 - `docs/` y `bitacora-construccion/`: documentación compartida en la raíz. La skill [construir-con-evidencia](../.agents/skills/construir-con-evidencia/SKILL.md) está en la raíz del proyecto, dentro de `.agents/skills`.
 - Plugins Upstash y Turso instalados y habilitados para este proyecto; autenticación OAuth y recursos remotos pendientes.
 
@@ -30,6 +30,6 @@ Ejecutar cada plan en este orden. Las comprobaciones de aceptación son trabajo 
 
 Leer [alcance](product/01-proposito-y-alcance.md), [recorrido](product/02-requisitos-y-recorrido.md), [arquitectura legible](product/03-arquitectura-y-legibilidad.md) y [datos y formatos](product/04-datos-y-formatos.md). Los [tres diagramas](diagrams/01-contexto-y-responsabilidades.md) describen el objetivo.
 
-Fuentes: [filosofía y VOZ](fonts/04-contrato-voz-y-filosofia.md), [Focus](fonts/06-estilo-visual-focus-macos.md), [Markdown](fonts/08-markdown-pantalla-y-voz.md), [Blob](fonts/09-upstash-blob-y-herramientas.md), [Clerk](fonts/10-clerk-nuxt-y-python.md), [base Nuxt y cursos](fonts/11-base-nuxt-y-cursos.md), [Turso](fonts/12-turso-usuarios-python.md), [antecedentes recuperados](fonts/13-antecedentes-api-recuperados.md), [voz y MCP](fonts/14-voz-python-y-mcp.md).
+Fuentes: [filosofía y VOZ](fonts/04-contrato-voz-y-filosofia.md), [Focus](fonts/06-estilo-visual-focus-macos.md), [Markdown](fonts/08-markdown-pantalla-y-voz.md), [Blob](fonts/09-upstash-blob-y-herramientas.md), [Clerk](fonts/10-clerk-nuxt-y-python.md), [base Nuxt y cursos](fonts/11-base-nuxt-y-cursos.md), [Turso](fonts/12-turso-usuarios-python.md), [antecedentes recuperados](fonts/13-antecedentes-api-recuperados.md), [voz y MCP](fonts/14-voz-python-y-mcp.md), [FastAPI base](fonts/16-fastapi-base-curso.md).
 
-No se crearon commits ni tags. El historial Git y el índice previo se conservan; los planes antiguos se sustituyen por petición expresa del usuario.
+Punto de control `v0.1.0` creado antes de API 01. El historial Git se conserva; los planes antiguos se sustituyen por petición expresa del usuario.
